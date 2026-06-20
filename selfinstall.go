@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/sys/windows/registry"
 )
 
-// selfInstallToggle erstellt oder entfernt einen Symlink auf die laufende Binary.
-// Symlink statt Kopie: der globale Aufruf zeigt immer auf die aktuelle Binary —
-// ein `go build` genügt, kein erneutes Installieren nötig.
 func selfInstallToggle() (msg string, isErr bool) {
 	exe, err := os.Executable()
 	if err != nil {
@@ -17,42 +17,83 @@ func selfInstallToggle() (msg string, isErr bool) {
 	}
 	exe, _ = filepath.EvalSymlinks(exe)
 
-	systemTarget := "/usr/local/bin/bashq"
-	home, _ := os.UserHomeDir()
-	userTarget := filepath.Join(home, ".local/bin/bashq")
+	installDir := filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", "winq")
+	target := filepath.Join(installDir, "winq.exe")
 
-	// Prüfen ob bereits installiert (Datei oder Symlink)
-	installedAt := ""
-	if _, err := os.Lstat(systemTarget); err == nil {
-		installedAt = systemTarget
-	} else if _, err := os.Lstat(userTarget); err == nil {
-		installedAt = userTarget
-	}
-
-	if installedAt != "" {
-		// Deinstallieren — Symlink oder Datei entfernen
-		if err := os.Remove(installedAt); err != nil {
-			return fmt.Sprintf("✗ Konnte %s nicht entfernen: %v", installedAt, err), true
+	if _, err := os.Stat(target); err == nil {
+		if err := os.RemoveAll(installDir); err != nil {
+			return fmt.Sprintf("✗ Konnte %s nicht entfernen: %v", installDir, err), true
 		}
-		return fmt.Sprintf("✓ %s entfernt", installedAt), false
+		if err := removeFromUserPath(installDir); err != nil {
+			return fmt.Sprintf("✓ winq deinstalliert (PATH-Eintrag konnte nicht entfernt werden: %v)", err), false
+		}
+		return "✓ winq deinstalliert", false
 	}
 
-	// Installieren — erst systemweit versuchen, dann ~/.local/bin
-	if err := os.Symlink(exe, systemTarget); err == nil {
-		return fmt.Sprintf("✓ %s → %s\n  von überall aufrufbar — auch nach go build sofort aktuell", systemTarget, exe), false
+	if err := os.MkdirAll(installDir, 0755); err != nil {
+		return fmt.Sprintf("✗ Konnte Verzeichnis nicht anlegen: %v", err), true
 	}
+	if err := copyFile(exe, target); err != nil {
+		return fmt.Sprintf("✗ Kopieren fehlgeschlagen: %v", err), true
+	}
+	if err := addToUserPath(installDir); err != nil {
+		return fmt.Sprintf("✓ %s\n  ⚠ PATH-Eintrag fehlgeschlagen: %v", target, err), false
+	}
+	return fmt.Sprintf("✓ %s\n  Neues Terminal öffnen damit PATH aktiv wird", target), false
+}
 
-	// Fallback: ~/.local/bin
-	if err := os.MkdirAll(filepath.Dir(userTarget), 0755); err != nil {
-		return fmt.Sprintf("✗ Konnte ~/.local/bin nicht anlegen: %v", err), true
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
 	}
-	if err := os.Symlink(exe, userTarget); err != nil {
-		return fmt.Sprintf("✗ Symlink fehlgeschlagen: %v\n  Tipp: sudo ln -sf %s /usr/local/bin/bashq", err, exe), true
+	defer in.Close()
+	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
 	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return err
+}
 
-	localBinDir := filepath.Dir(userTarget)
-	if !strings.Contains(os.Getenv("PATH"), localBinDir) {
-		return fmt.Sprintf("✓ %s → %s\n  ⚠ ~/.local/bin ist nicht im PATH:\n    export PATH=\"$HOME/.local/bin:$PATH\"", userTarget, exe), false
+func addToUserPath(dir string) error {
+	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE|registry.SET_VALUE)
+	if err != nil {
+		return err
 	}
-	return fmt.Sprintf("✓ %s → %s\n  von überall aufrufbar — auch nach go build sofort aktuell", userTarget, exe), false
+	defer k.Close()
+	current, _, err := k.GetStringValue("Path")
+	if err != nil {
+		current = ""
+	}
+	if strings.Contains(strings.ToLower(current), strings.ToLower(dir)) {
+		return nil
+	}
+	newPath := current
+	if newPath != "" && !strings.HasSuffix(newPath, ";") {
+		newPath += ";"
+	}
+	newPath += dir
+	return k.SetStringValue("Path", newPath)
+}
+
+func removeFromUserPath(dir string) error {
+	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE|registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer k.Close()
+	current, _, err := k.GetStringValue("Path")
+	if err != nil {
+		return nil
+	}
+	parts := strings.Split(current, ";")
+	filtered := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if !strings.EqualFold(strings.TrimSpace(p), dir) {
+			filtered = append(filtered, p)
+		}
+	}
+	return k.SetStringValue("Path", strings.Join(filtered, ";"))
 }

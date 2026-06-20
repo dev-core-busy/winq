@@ -33,7 +33,7 @@ func configFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "bashq", "config.json"), nil
+	return filepath.Join(dir, "winq", "config.json"), nil
 }
 
 func loadConfig() appConfig {

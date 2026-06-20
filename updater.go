@@ -7,14 +7,13 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 const currentVersion = "v1.0.0"
-const githubReleasesAPI = "https://api.github.com/repos/dev-core-busy/bashq/releases/latest"
+const githubReleasesAPI = "https://api.github.com/repos/dev-core-busy/winq/releases/latest"
 
 type updateInfo struct {
 	version     string
@@ -52,7 +51,7 @@ func cmdCheckUpdate() tea.Cmd {
 			return updateCheckMsg{err: err}
 		}
 		req.Header.Set("Accept", "application/vnd.github+json")
-		req.Header.Set("User-Agent", "bashq/"+currentVersion)
+		req.Header.Set("User-Agent", "winq/"+currentVersion)
 
 		resp, err := client.Do(req)
 		if err != nil {
@@ -73,8 +72,7 @@ func cmdCheckUpdate() tea.Cmd {
 			return updateCheckMsg{} // bereits aktuell
 		}
 
-		// Architekturspezifisches Asset suchen
-		assetName := "bashq-linux-" + runtime.GOARCH // z.B. bashq-linux-amd64
+		assetName := "winq-windows-amd64.exe"
 		downloadURL := ""
 		for _, asset := range release.Assets {
 			if asset.Name == assetName {

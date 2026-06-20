@@ -1,4 +1,6 @@
-# CLAUDE.md — winq (Windows Command Agent)
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Projekt
 
@@ -102,7 +104,8 @@ func selfInstallToggle() (msg string, isErr bool) {
 }
 ```
 
-Hilfsfunktionen `addToUserPath` / `removeFromUserPath` via `golang.org/x/sys/windows/registry`.
+Hilfsfunktionen `addToUserPath` / `removeFromUserPath` via `golang.org/x/sys/windows/registry`.  
+**Hinweis:** `golang.org/x/sys` ist bereits in `go.mod` eingetragen — kein `go get` nötig.
 
 ---
 
@@ -156,7 +159,7 @@ filepath.Join(dir, "winq", "config.json")
 
 ### 8. `activities.go` — Log-Pfad anpassen
 
-Analog zu config_persist.go: `"linux_cmd_agent"` → `"winq"` in allen Pfaden.
+Analog zu config_persist.go: `"bashq"` → `"winq"` in `activityLogPath()`.
 
 ---
 
@@ -187,7 +190,36 @@ Windows Terminal (WT) oder PowerShell 7 empfohlen — klassisches `cmd.exe` unte
 
 ---
 
-## Architektur (identisch zu bashq)
+## Architektur
+
+### Bubbletea-Zustandsmaschine
+
+Die App folgt dem Elm-Architektur-Muster via [Bubbletea](https://github.com/charmbracelet/bubbletea):
+
+- `model.go` — `model`-Struct mit `appState`-Enum (`stateIdle`, `stateLoading`, `stateConfirm`, `stateExecuting`, `stateConfig`, `stateEditPrompt`, `stateDiscover`)
+- `update.go` — `Update()`: verarbeitet alle `tea.Msg`-Typen und steuert Zustandsübergänge
+- `view.go` — `View()`: rendert den TUI-Bildschirm basierend auf aktuellem State
+
+Nachrichten-Typen (`agentResponseMsg`, `commandResultMsg`, `errMsg`, `spinTickMsg` usw.) verbinden asynchrone Go-Routinen mit der Bubbletea-Schleife.
+
+### i18n-Muster
+
+Alle UI-Strings laufen über `L.*` (globale `*UIStrings`-Instanz, gesetzt durch `setLang()`).  
+Nach einer Sprachänderung muss `rebuildTools()` aufgerufen werden, weil Tool-Beschreibungen (`L.ToolDesc`, `L.ToolArgCmd`, `L.ToolArgExpl`) ebenfalls übersetzt werden.
+
+### LLM-Kommunikation (`agent.go`)
+
+- Verwendet die OpenAI-kompatible Chat-Completions-API (`/chat/completions`)
+- Ein einziges Tool wird registriert: `execute_command` mit den Parametern `command` und `explanation`
+- `<think>...</think>`-Tags werden aus Antworten herausgefiltert (für Reasoning-Modelle)
+- Der System-Prompt wird bei jedem Aufruf dynamisch zusammengebaut (`customPrompt` vorangestellt)
+- Gesprächsverlauf wird in `Agent.history` gehalten; `Reset()` löscht alles außer dem System-Prompt
+
+### LLM-Profil-Discovery (`discovery.go`)
+
+Scannt häufige Ports (11434, 1234, 8080 …) parallel per TCP-Probe und fragt dann sowohl OpenAI `/models` als auch Ollama `/api/tags` ab. Akzeptiert als Eingabe volle URL, `host:port`, oder nur Hostname.
+
+### Datei-Übersicht
 
 | Datei               | Verantwortung                                          |
 |---------------------|--------------------------------------------------------|
@@ -205,13 +237,6 @@ Windows Terminal (WT) oder PowerShell 7 empfohlen — klassisches `cmd.exe` unte
 | `i18n.go`           | Mehrsprachigkeit (de/en/zh)                            |
 | `discovery.go`      | LLM-Profil-Erkennung                                   |
 | `session_persist.go`| Sitzungsspeicherung                                    |
-
-## Abhängigkeiten hinzufügen
-
-Für `selfinstall.go` (Registry-Zugriff):
-```bash
-go get golang.org/x/sys
-```
 
 ## Referenz
 

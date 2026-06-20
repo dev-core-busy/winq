@@ -59,7 +59,7 @@ func activityLogPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "bashq", "activities.log"), nil
+	return filepath.Join(dir, "winq", "activities.log"), nil
 }
 
 func (m *model) formatActivities() string {

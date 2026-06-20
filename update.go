@@ -949,7 +949,7 @@ func cmdSendToolResult(agent *Agent, callID, result string) tea.Cmd {
 
 func cmdRunCommand(callID, command string) tea.Cmd {
 	return func() tea.Msg {
-		cmd := exec.Command("bash", "-c", command)
+		cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", command)
 		out, err := cmd.CombinedOutput()
 		return commandResultMsg{
 			callID: callID,

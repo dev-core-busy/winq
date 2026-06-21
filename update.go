@@ -1028,7 +1028,7 @@ func cmdSendToolResult(ctx context.Context, agent *Agent, callID, result string)
 
 func cmdRunCommand(ctx context.Context, callID, command string) tea.Cmd {
 	return func() tea.Msg {
-		cmd := exec.CommandContext(ctx, "bash", "-c", command)
+		cmd := exec.CommandContext(ctx, "powershell", "-NoProfile", "-NonInteractive", "-Command", command)
 		out, err := cmd.CombinedOutput()
 		if ctx.Err() != nil {
 			return commandResultMsg{callID: callID, cancelled: true}

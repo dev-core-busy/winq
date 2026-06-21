@@ -34,7 +34,7 @@ func sessionFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "bashq", "session.json"), nil
+	return filepath.Join(dir, "winq", "session.json"), nil
 }
 
 // saveSession schreibt Chatverlauf, Agenten-History und Eingabe-History auf Disk.

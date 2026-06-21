@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -68,7 +70,7 @@ func cmdCheckUpdate() tea.Cmd {
 			return updateCheckMsg{err: err}
 		}
 
-		if release.TagName == "" || release.TagName <= currentVersion {
+		if release.TagName == "" || !semverGT(release.TagName, currentVersion) {
 			return updateCheckMsg{} // bereits aktuell oder älter
 		}
 
@@ -142,4 +144,27 @@ func cmdDownloadUpdate(info updateInfo) tea.Cmd {
 
 		return updateDoneMsg{version: info.version, execPath: exe}
 	}
+}
+
+// semverGT gibt true zurück wenn a semantisch größer als b ist (z.B. "v1.0.10" > "v1.0.9").
+func semverGT(a, b string) bool {
+	parse := func(v string) [3]int {
+		v = strings.TrimPrefix(v, "v")
+		parts := strings.SplitN(v, ".", 3)
+		for len(parts) < 3 {
+			parts = append(parts, "0")
+		}
+		var n [3]int
+		for i := 0; i < 3; i++ {
+			n[i], _ = strconv.Atoi(parts[i])
+		}
+		return n
+	}
+	av, bv := parse(a), parse(b)
+	for i := 0; i < 3; i++ {
+		if av[i] != bv[i] {
+			return av[i] > bv[i]
+		}
+	}
+	return false
 }

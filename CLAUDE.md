@@ -21,10 +21,9 @@ Cross-Compile von Linux:
 GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o winq.exe .
 ```
 
-## Status: Ausgangsbasis kopiert — noch nicht Windows-fähig
+## Status: v1.0.1 — vollständig Windows-fähig ✅
 
-Der Code kompiliert für Windows, ist aber inhaltlich noch Linux/bashq.  
-Folgende Aufgaben müssen **in dieser Reihenfolge** erledigt werden:
+Alle TODOs abgeschlossen. Der Code ist bereinigt und kompiliert für Windows.
 
 ---
 

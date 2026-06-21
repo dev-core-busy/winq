@@ -242,3 +242,16 @@ Scannt häufige Ports (11434, 1234, 8080 …) parallel per TCP-Probe und fragt d
 
 Originalprojekt: `../linux_cmd_agent` (bashq)  
 Alle TODO-Punkte sind unabhängig voneinander außer Punkt 1+3 (beide betreffen syscall.Exec).
+
+## Daueraufgabe: bashq → winq synchron halten
+
+**Änderungen in bashq, die Windows-kompatibel sind, müssen immer auch hier umgesetzt werden.**
+
+Shared files (direkt kopierbar oder manuell anpassen):
+`view.go`, `i18n.go`, `model.go`, `styles.go`, `agent.go`, `commands.go`, `activities.go`
+
+Windows-spezifische Dateien (NICHT überschreiben):
+- `main.go` — kein `syscall.Exec`
+- `update.go` — `powershell` statt `bash -c`
+- `selfinstall.go` — Windows PATH-Eintrag
+- `colors.go` — No-op Stub

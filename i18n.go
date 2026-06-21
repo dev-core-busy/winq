@@ -236,7 +236,7 @@ var de = UIStrings{
 	ConfirmCancelLabel: "Abbrechen",
 
 	LoadingThinking:   " Denke nach…",
-	LoadingQuit:       "  Ctrl+C Beenden",
+	LoadingQuit:       "  Ctrl+Q Beenden",
 	LoadingRunning:    " Führe aus: ",
 	LoadingCmdRunning: "  Befehl läuft…",
 
@@ -439,7 +439,7 @@ TASTENKÜRZEL:
   F1–F9       – Benutzerdefinierte Kürzel (in /config belegen)
   Shift+Tab   – Ausführmodus umschalten (Fragen ↔ Auto)
   Esc         – Autovervollständigung schließen
-  Ctrl+C      – Beenden`,
+  Ctrl+Q      – Beenden`,
 }
 
 var en = UIStrings{
@@ -470,7 +470,7 @@ var en = UIStrings{
 	ConfirmCancelLabel: "Cancel",
 
 	LoadingThinking:   " Thinking…",
-	LoadingQuit:       "  Ctrl+C Quit",
+	LoadingQuit:       "  Ctrl+Q Quit",
 	LoadingRunning:    " Running: ",
 	LoadingCmdRunning: "  Command running…",
 
@@ -673,7 +673,7 @@ KEYBOARD SHORTCUTS:
   F1–F9       – Custom shortcuts (configure in /config)
   Shift+Tab   – Toggle execution mode (Ask ↔ Auto)
   Esc         – Close autocomplete
-  Ctrl+C      – Quit`,
+  Ctrl+Q      – Quit`,
 }
 
 var zh = UIStrings{
@@ -704,7 +704,7 @@ var zh = UIStrings{
 	ConfirmCancelLabel: "取消",
 
 	LoadingThinking:   " 思考中…",
-	LoadingQuit:       "  Ctrl+C 退出",
+	LoadingQuit:       "  Ctrl+Q 退出",
 	LoadingRunning:    " 正在执行：",
 	LoadingCmdRunning: "  命令运行中…",
 
@@ -907,7 +907,7 @@ var zh = UIStrings{
   F1–F9       – 自定义快捷键（在 /config 中设置）
   Shift+Tab   – 切换执行模式（询问 ↔ 自动）
   Esc         – 关闭自动补全
-  Ctrl+C      – 退出`,
+  Ctrl+Q      – 退出`,
 }
 
 // supportedLangs definiert die Reihenfolge beim Durchschalten in /config.

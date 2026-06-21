@@ -30,15 +30,17 @@ type UIStrings struct {
 	HintModeLabel     string // "Modus"
 	HintShortcutKeys  string // "F1–F9"
 	HintShortcutLabel string // "Kürzel"
+	HintHistoryKeys   string // "Alt+↑↓"
+	HintHistoryLabel  string // "History"
 	HintQuitKey       string // "Ctrl+Q"
 	HintQuitLabel     string // "Beenden"
 	ACHint            string
 	ACMore            string // "%d weitere"
 
 	// Untere Leiste – Bestätigung
-	ConfirmYesKey      string // "J/Enter"
-	ConfirmNoKey       string // "N/Esc"
-	ConfirmRunLabel    string // "Ausführen"
+	ConfirmYesKey    string // "J/Enter"
+	ConfirmNoKey     string // "N/Esc"
+	ConfirmRunLabel  string // "Ausführen"
 	ConfirmCancelLabel string // "Abbrechen"
 
 	// Untere Leiste – Laden/Ausführen
@@ -48,25 +50,25 @@ type UIStrings struct {
 	LoadingCmdRunning string // "Befehl läuft…"
 
 	// Untere Leiste – Konfiguration
-	ConfigNavKeys      string // "↑↓"
-	ConfigNavLabel     string // "navigieren"
-	ConfigEditKey      string // "Enter"
-	ConfigEditLabel    string // "bearbeiten"
-	ConfigCloseKey     string // "Esc"
-	ConfigCloseLabel   string // "schließen"
-	ConfigModeHint     string // "Ausführmodus umschalten"
-	ConfigSaveKey      string // "Enter"
-	ConfigSaveLabel    string // "speichern"
-	ConfigCancelKey    string // "Esc"
-	ConfigCancelLabel  string // "abbrechen"
+	ConfigNavKeys     string // "↑↓"
+	ConfigNavLabel    string // "navigieren"
+	ConfigEditKey     string // "Enter"
+	ConfigEditLabel   string // "bearbeiten"
+	ConfigCloseKey    string // "Esc"
+	ConfigCloseLabel  string // "schließen"
+	ConfigModeHint    string // "Ausführmodus umschalten"
+	ConfigSaveKey     string // "Enter"
+	ConfigSaveLabel   string // "speichern"
+	ConfigCancelKey   string // "Esc"
+	ConfigCancelLabel string // "abbrechen"
 	ConfigEditingBelow string // "[bearbeite unten]"
 
 	// Untere Leiste – Prompt-Editor
-	PromptSaveKey     string // "Ctrl+S"
-	PromptSaveLabel   string // "speichern"
-	PromptCancelKey   string // "Esc"
+	PromptSaveKey    string // "Ctrl+S"
+	PromptSaveLabel  string // "speichern"
+	PromptCancelKey  string // "Esc"
 	PromptCancelLabel string // "abbrechen"
-	PromptDesc        string // "System-Prompt wird dem Assistenten vorangestellt"
+	PromptDesc       string // "System-Prompt wird dem Assistenten vorangestellt"
 
 	// Textarea-Platzhalter
 	TextareaPlaceholder string
@@ -109,27 +111,27 @@ type UIStrings struct {
 	BadgeSessionOff string // " SESSION "
 
 	// Systemnachrichten (update.go)
-	MsgUpdateAvailable   string // "🔄 Neue Version %s verfügbar…"
+	MsgUpdateAvailable  string // "🔄 Neue Version %s verfügbar…"
 	MsgUpdateDownloading string // "⬇ Lade Update %s herunter…"
-	MsgUpdateDone        string // "✓ winq %s installiert. Bitte neu starten."
-	MsgUpdateUpToDate    string // "✓ winq ist aktuell (%s)"
-	MsgUpdateError       string // "⚠ Update fehlgeschlagen: %s"
-	MsgModeAuto          string // "⚡ Modus: Auto-Ausführen ..."
-	MsgModeAsk           string // "🛡 Modus: Fragen ..."
-	MsgSessionOn         string // "💾 Sitzungen werden gespeichert …"
-	MsgSessionOff        string // "🚫 Sitzungen werden nicht gespeichert …"
-	MsgShortcutEmpty     string // "F%d ist nicht belegt..."
-	MsgCancelled         string // "✗ Abgebrochen"
-	MsgAutoExecFmt       string // "⚡ Auto: $ %s\n  %s"
-	MsgConfirmCmdFmt     string // "Ich möchte folgenden Befehl ausführen:..."
-	MsgNoOutput          string // "(kein Output)"
-	MsgExitError         string // "⚠ Exit-Fehler: "
-	MsgToolRejected      string // Tool-Ablehnung an LLM
+	MsgUpdateDone       string // "✓ bashq %s installiert. Bitte neu starten."
+	MsgUpdateUpToDate   string // "✓ bashq ist aktuell (%s)"
+	MsgUpdateError      string // "⚠ Update fehlgeschlagen: %s"
+	MsgModeAuto       string // "⚡ Modus: Auto-Ausführen ..."
+	MsgModeAsk        string // "🛡 Modus: Fragen ..."
+	MsgSessionOn      string // "💾 Sitzungen werden gespeichert …"
+	MsgSessionOff     string // "🚫 Sitzungen werden nicht gespeichert …"
+	MsgShortcutEmpty  string // "F%d ist nicht belegt..."
+	MsgCancelled      string // "✗ Abgebrochen"
+	MsgAutoExecFmt    string // "⚡ Auto: $ %s\n  %s"
+	MsgConfirmCmdFmt  string // "Ich möchte folgenden Befehl ausführen:..."
+	MsgNoOutput       string // "(kein Output)"
+	MsgExitError      string // "⚠ Exit-Fehler: "
+	MsgToolRejected   string // Tool-Ablehnung an LLM
 
 	// Chat-Bereich
-	WelcomeMsg         string
-	LabelUser          string // " Du "
-	LabelAssistant     string // " Assistent "
+	WelcomeMsg             string
+	LabelUser              string // " Du "
+	LabelAssistant         string // " Assistent "
 	SessionRestoredFmt string // "📂 Sitzung vom %s fortgesetzt"
 
 	// Aktivitätsprotokoll
@@ -152,13 +154,13 @@ type UIStrings struct {
 	ExtraPromptFmt string // Präfix für customPrompt
 
 	// Profil-Verwaltung
-	ProfileActive       string // "● aktiv"
-	ProfilePreferred    string // "★"
-	ProfileAddBtn       string // "[ + Neues LLM-Profil ]"
-	ProfileTabSettings  string // "Tab: Einstellungen"
-	ProfileTabProfiles  string // "Tab: Profile"
-	ProfilePreferLabel  string // "bevorzugen"
-	ProfileDeleteLabel  string // "löschen"
+	ProfileActive      string // "● aktiv"
+	ProfilePreferred   string // "★"
+	ProfileAddBtn      string // "[ + Neues LLM-Profil ]"
+	ProfileTabSettings string // "Tab: Einstellungen"
+	ProfileTabProfiles string // "Tab: Profile"
+	ProfilePreferLabel string // "bevorzugen"
+	ProfileDeleteLabel string // "löschen"
 	ProfileActivatedFmt string // "Profil '%s' aktiviert"
 
 	// Discovery (stateDiscover)
@@ -203,6 +205,7 @@ type UIStrings struct {
 	CmdOptimizeMsg    string
 	CmdConfigDesc     string
 	CmdSetupDesc      string // "/setup"
+	CmdColorsDesc     string // "/colors"
 	CmdActivitiesDesc string
 	CmdHelpDesc       string
 	CmdClearDesc      string
@@ -214,7 +217,7 @@ var de = UIStrings{
 	LangCode: "de",
 	LangName: "Deutsch",
 
-	TitleApp:    "winq",
+	TitleApp:    "bashq",
 	TitleConfig: "Einstellungen",
 	BadgeAuto:   " AUTO ",
 	BadgeAsk:    " ASK ",
@@ -229,6 +232,8 @@ var de = UIStrings{
 	HintModeLabel:     "Modus",
 	HintShortcutKeys:  "F1–F9/Alt+1–9",
 	HintShortcutLabel: "Kürzel",
+	HintHistoryKeys:   "Alt+↑↓",
+	HintHistoryLabel:  "History",
 	HintQuitKey:       "Ctrl+Q",
 	HintQuitLabel:     "Beenden",
 	ACHint:            "  ↑↓/Tab: wählen · Enter: bestätigen · Esc: schließen",
@@ -240,9 +245,9 @@ var de = UIStrings{
 	ConfirmCancelLabel: "Abbrechen",
 
 	LoadingThinking:   " Denke nach…",
-	LoadingQuit:       "  Ctrl+C Beenden",
+	LoadingQuit:       "  Ctrl+C Abbrechen",
 	LoadingRunning:    " Führe aus: ",
-	LoadingCmdRunning: "  Befehl läuft…",
+	LoadingCmdRunning: "  Ctrl+C Abbrechen",
 
 	ConfigNavKeys:      "↑↓",
 	ConfigNavLabel:     "navigieren",
@@ -323,23 +328,23 @@ var de = UIStrings{
 	BadgeSessionOff:    " SESSION ",
 
 	MsgUpdateAvailable:   "🔄 Neue Version %s verfügbar. Alt+U installieren · Esc ignorieren",
-	MsgUpdateDownloading: "⬇ Lade winq %s herunter…",
-	MsgUpdateDone:        "✓ winq %s installiert — bitte neu starten",
-	MsgUpdateUpToDate:    "✓ winq ist aktuell (%s)",
+	MsgUpdateDownloading: "⬇ Lade bashq %s herunter…",
+	MsgUpdateDone:        "✓ bashq %s installiert — bitte neu starten",
+	MsgUpdateUpToDate:    "✓ bashq ist aktuell (%s)",
 	MsgUpdateError:       "⚠ Update fehlgeschlagen: %s",
-	MsgModeAuto:          "⚡ Modus: Auto-Ausführen (Befehle werden ohne Rückfrage ausgeführt)",
-	MsgModeAsk:           "🛡 Modus: Fragen (Befehle werden vor Ausführung bestätigt)",
-	MsgSessionOn:         "💾 Sitzungen werden gespeichert (Alt+S zum Umschalten)",
-	MsgSessionOff:        "🚫 Sitzungen werden nicht gespeichert (Alt+S zum Umschalten)",
-	MsgShortcutEmpty:     "F%d ist nicht belegt. Belegen über /config → Tastenkürzel.",
-	MsgCancelled:         "✗ Abgebrochen",
-	MsgAutoExecFmt:       "⚡ Auto: $ %s\n  %s",
-	MsgConfirmCmdFmt:     "Ich möchte folgenden Befehl ausführen:\n\n  $ %s\n\n%s",
-	MsgNoOutput:          "(kein Output)",
-	MsgExitError:         "⚠ Exit-Fehler: ",
-	MsgToolRejected:      "FEHLER: Der Benutzer hat die Ausführung abgelehnt.",
+	MsgModeAuto:      "⚡ Modus: Auto-Ausführen (Befehle werden ohne Rückfrage ausgeführt)",
+	MsgModeAsk:       "🛡 Modus: Fragen (Befehle werden vor Ausführung bestätigt)",
+	MsgSessionOn:     "💾 Sitzungen werden gespeichert (Alt+S zum Umschalten)",
+	MsgSessionOff:    "🚫 Sitzungen werden nicht gespeichert (Alt+S zum Umschalten)",
+	MsgShortcutEmpty: "F%d ist nicht belegt. Belegen über /config → Tastenkürzel.",
+	MsgCancelled:     "✗ Abgebrochen",
+	MsgAutoExecFmt:   "⚡ Auto: $ %s\n  %s",
+	MsgConfirmCmdFmt: "Ich möchte folgenden Befehl ausführen:\n\n  $ %s\n\n%s",
+	MsgNoOutput:      "(kein Output)",
+	MsgExitError:     "⚠ Exit-Fehler: ",
+	MsgToolRejected:  "FEHLER: Der Benutzer hat die Ausführung abgelehnt.",
 
-	WelcomeMsg:         "\n  winq bereit – dein KI-Assistent für Windows.\n  Stell mir eine Frage oder tippe / für verfügbare Befehle.\n",
+	WelcomeMsg:         "\n  bashq bereit – das Q-Kontinuum deines Terminals.\n  Stell mir eine Frage oder tippe / für verfügbare Befehle.\n",
 	LabelUser:          " Du ",
 	LabelAssistant:     " Assistent ",
 	SessionRestoredFmt: "📂 Sitzung vom %s fortgesetzt",
@@ -353,10 +358,10 @@ var de = UIStrings{
 	KindExec:          "Ausführung",
 	KindError:         "Fehler    ",
 
-	SystemPrompt: `Du bist ein freundlicher und geduldiger Windows-Assistent für Benutzer ohne Windows-Kenntnisse.
+	SystemPrompt: `Du bist ein freundlicher und geduldiger Linux-Assistent für Benutzer ohne Linux-Kenntnisse.
 
 DEINE AUFGABE:
-- Hilf dem Benutzer bei der Verwaltung seines Windows-Systems
+- Hilf dem Benutzer bei der Verwaltung seines Debian-Linux-Systems
 - Erkläre alles in einfacher, verständlicher deutscher Sprache
 - Führe Systembefehle über das execute_command Tool aus
 
@@ -368,25 +373,13 @@ WICHTIGE REGELN:
 - Wenn du mehrere Befehle brauchst, führe sie nacheinander aus
 - Zeige Ergebnisse in einer lesbaren Form
 
-WICHTIG — NUR POWERSHELL, KEIN WSL, KEIN LINUX:
-- Dies ist ein NATIVES Windows-System — kein WSL, kein Linux, kein Dual-Boot
-- Verwende ausschließlich PowerShell 5.1 / 7+ Befehle
-- VERBOTEN: bash, wsl, apt, apt-get, systemctl, journalctl, df, free, chmod, sudo
-- Erwähne NIEMALS WSL oder Linux-Befehle als Lösung oder Alternative
-- Windows-Pfade: C:\, %USERPROFILE%, $env:APPDATA
-- Paketmanager: winget (vorrangig), alternativ choco oder scoop
-- Dienste: Get-Service, Start-Service, Stop-Service
-- Prozesse: Get-Process, Stop-Process
-- Netzwerk: Test-NetConnection, Get-NetAdapter, ipconfig
-- Dateisystem: Get-ChildItem, Copy-Item, Remove-Item
-
 TOOL-NUTZUNG:
 - Nutze execute_command für alle Systembefehle
 - Erkläre im "explanation"-Feld was der Befehl macht (einfache Sprache)
-- Fasse Befehle wenn möglich zusammen (z.B. mit ;)`,
+- Fasse Befehle wenn möglich zusammen (z.B. mit &&)`,
 
-	ToolDesc:       "Führt einen PowerShell-Befehl auf dem Windows-System aus und gibt die Ausgabe zurück",
-	ToolArgCmd:     "Der auszuführende PowerShell-Befehl",
+	ToolDesc:       "Führt einen Shell-Befehl auf dem Linux-System aus und gibt die Ausgabe zurück",
+	ToolArgCmd:     "Der auszuführende Shell-Befehl (bash)",
 	ToolArgExpl:    "Kurze, einfache Erklärung was dieser Befehl tut (für den Benutzer)",
 	ExtraPromptFmt: "## Zusätzliche Anweisungen (haben Vorrang):\n%s\n\n---\n\n%s",
 
@@ -394,10 +387,10 @@ TOOL-NUTZUNG:
 	CmdInstallPrompt:  "Installiere bitte: ",
 	CmdRemoveDesc:     "Software entfernen",
 	CmdRemovePrompt:   "Entferne bitte: ",
-	CmdUpdateDesc:     "Programme aktualisieren",
-	CmdUpdateMsg:      "Bitte aktualisiere alle installierten Programme mit winget",
+	CmdUpdateDesc:     "System aktualisieren",
+	CmdUpdateMsg:      "Aktualisiere bitte mein System (apt update && apt upgrade)",
 	CmdStatusDesc:     "Systemstatus anzeigen",
-	CmdStatusMsg:      "Zeig mir einen kompakten Überblick über den Windows-Systemstatus (laufende Dienste, CPU, RAM, Festplatte, Uptime)",
+	CmdStatusMsg:      "Zeig mir einen kompakten Überblick über den Systemstatus (CPU, RAM, Festplatte, Uptime)",
 	CmdDiskDesc:       "Festplattennutzung",
 	CmdDiskMsg:        "Wie viel Festplattenplatz habe ich noch frei?",
 	CmdMemoryDesc:     "Arbeitsspeicher anzeigen",
@@ -407,34 +400,35 @@ TOOL-NUTZUNG:
 	CmdServicesDesc:   "Systemdienste verwalten",
 	CmdServicesPrompt: "Systemdienst: ",
 	CmdLogsDesc:       "Systemlogs anzeigen",
-	CmdLogsMsg:        "Zeig mir die wichtigsten aktuellen Windows-Systemereignisse (Get-EventLog System, letzte 50 Einträge)",
+	CmdLogsMsg:        "Zeig mir die wichtigsten aktuellen Systemlogs (letzte 20 Zeilen)",
 	CmdOptimizeDesc:   "System optimieren",
-	CmdOptimizeMsg:    "Was kann ich tun um mein Windows-System zu optimieren und schneller zu machen?",
+	CmdOptimizeMsg:    "Was kann ich tun um mein Debian-System zu optimieren und schneller zu machen?",
 	CmdConfigDesc:     "Einstellungen bearbeiten",
-	CmdSetupDesc:      "winq systemweit installieren / deinstallieren",
+	CmdSetupDesc:      "bashq systemweit installieren / deinstallieren",
+	CmdColorsDesc:     "Terminal-Farben in ~/.bashrc einrichten",
 	CmdActivitiesDesc: "Aktivitätsprotokoll anzeigen",
 	CmdHelpDesc:       "Hilfe anzeigen",
 	CmdClearDesc:      "Chat-Verlauf leeren",
 	CmdExitDesc:       "Programm beenden",
 
-	HelpText: `winq – Hilfe
+	HelpText: `bashq – Hilfe
 
 Schreibe auf Deutsch was du tun möchtest.
 Ich erkläre jeden Schritt und frage vor gefährlichen Aktionen nach.
 
 SLASH-BEFEHLE (tippe / für Autovervollständigung):
-  /install    – Software installieren (winget)
+  /install    – Software installieren
   /remove     – Software entfernen
-  /update     – Programme aktualisieren (winget)
+  /update     – System aktualisieren
   /status     – Systemstatus anzeigen
   /disk       – Festplattennutzung
   /memory     – Arbeitsspeicher
   /network    – Netzwerkinformationen
   /services   – Dienste verwalten
-  /logs       – Systemereignisse anzeigen
+  /logs       – Systemlogs
   /optimize   – Optimierungstipps
   /config     – Einstellungen (LLM, System-Prompt, Tastenkürzel, Sprache)
-  /setup      – winq systemweit installieren / deinstallieren
+  /setup      – bashq systemweit installieren / deinstallieren
   /activities – Aktivitätsprotokoll dieser Sitzung
   /clear      – Chat leeren
   /exit       – Beenden
@@ -445,14 +439,15 @@ TASTENKÜRZEL:
   F1–F9       – Benutzerdefinierte Kürzel (in /config belegen)
   Shift+Tab   – Ausführmodus umschalten (Fragen ↔ Auto)
   Esc         – Autovervollständigung schließen
-  Ctrl+C      – Beenden`,
+  Ctrl+C      – Laufende Anfrage / Befehl abbrechen
+  Ctrl+Q      – Beenden`,
 }
 
 var en = UIStrings{
 	LangCode: "en",
 	LangName: "English",
 
-	TitleApp:    "winq",
+	TitleApp:    "bashq",
 	TitleConfig: "Settings",
 	BadgeAuto:   " AUTO ",
 	BadgeAsk:    " ASK ",
@@ -467,6 +462,8 @@ var en = UIStrings{
 	HintModeLabel:     "mode",
 	HintShortcutKeys:  "F1–F9/Alt+1–9",
 	HintShortcutLabel: "shortcuts",
+	HintHistoryKeys:   "Alt+↑↓",
+	HintHistoryLabel:  "history",
 	HintQuitKey:       "Ctrl+Q",
 	HintQuitLabel:     "quit",
 	ACHint:            "  ↑↓/Tab: select · Enter: confirm · Esc: close",
@@ -478,9 +475,9 @@ var en = UIStrings{
 	ConfirmCancelLabel: "Cancel",
 
 	LoadingThinking:   " Thinking…",
-	LoadingQuit:       "  Ctrl+C Quit",
+	LoadingQuit:       "  Ctrl+C Cancel",
 	LoadingRunning:    " Running: ",
-	LoadingCmdRunning: "  Command running…",
+	LoadingCmdRunning: "  Ctrl+C Cancel",
 
 	ConfigNavKeys:      "↑↓",
 	ConfigNavLabel:     "navigate",
@@ -561,23 +558,23 @@ var en = UIStrings{
 	BadgeSessionOff:    " SESSION ",
 
 	MsgUpdateAvailable:   "🔄 New version %s available. Alt+U to install · Esc to skip",
-	MsgUpdateDownloading: "⬇ Downloading winq %s…",
-	MsgUpdateDone:        "✓ winq %s installed — please restart",
-	MsgUpdateUpToDate:    "✓ winq is up to date (%s)",
+	MsgUpdateDownloading: "⬇ Downloading bashq %s…",
+	MsgUpdateDone:        "✓ bashq %s installed — please restart",
+	MsgUpdateUpToDate:    "✓ bashq is up to date (%s)",
 	MsgUpdateError:       "⚠ Update failed: %s",
-	MsgModeAuto:          "⚡ Mode: Auto-execute (commands run without confirmation)",
-	MsgModeAsk:           "🛡 Mode: Ask (commands require confirmation before running)",
-	MsgSessionOn:         "💾 Sessions will be saved (Alt+S to toggle)",
-	MsgSessionOff:        "🚫 Sessions will not be saved (Alt+S to toggle)",
-	MsgShortcutEmpty:     "F%d is not assigned. Configure it in /config → Shortcuts.",
-	MsgCancelled:         "✗ Cancelled",
-	MsgAutoExecFmt:       "⚡ Auto: $ %s\n  %s",
-	MsgConfirmCmdFmt:     "I would like to run the following command:\n\n  $ %s\n\n%s",
-	MsgNoOutput:          "(no output)",
-	MsgExitError:         "⚠ Exit error: ",
-	MsgToolRejected:      "ERROR: The user rejected the execution.",
+	MsgModeAuto:      "⚡ Mode: Auto-execute (commands run without confirmation)",
+	MsgModeAsk:       "🛡 Mode: Ask (commands require confirmation before running)",
+	MsgSessionOn:     "💾 Sessions will be saved (Alt+S to toggle)",
+	MsgSessionOff:    "🚫 Sessions will not be saved (Alt+S to toggle)",
+	MsgShortcutEmpty: "F%d is not assigned. Configure it in /config → Shortcuts.",
+	MsgCancelled:     "✗ Cancelled",
+	MsgAutoExecFmt:   "⚡ Auto: $ %s\n  %s",
+	MsgConfirmCmdFmt: "I would like to run the following command:\n\n  $ %s\n\n%s",
+	MsgNoOutput:      "(no output)",
+	MsgExitError:     "⚠ Exit error: ",
+	MsgToolRejected:  "ERROR: The user rejected the execution.",
 
-	WelcomeMsg:         "\n  winq ready — your AI assistant for Windows.\n  Ask me anything or type / for available commands.\n",
+	WelcomeMsg:         "\n  bashq ready — the Q Continuum of your terminal.\n  Ask me anything or type / for available commands.\n",
 	LabelUser:          " You ",
 	LabelAssistant:     " Assistant ",
 	SessionRestoredFmt: "📂 Session resumed from %s",
@@ -591,10 +588,10 @@ var en = UIStrings{
 	KindExec:          "Execution ",
 	KindError:         "Error     ",
 
-	SystemPrompt: `You are a friendly and patient Windows assistant for users without Windows knowledge.
+	SystemPrompt: `You are a friendly and patient Linux assistant for users without Linux knowledge.
 
 YOUR TASK:
-- Help the user manage their Windows system
+- Help the user manage their Debian Linux system
 - Explain everything in simple, clear English
 - Execute system commands using the execute_command tool
 
@@ -606,25 +603,13 @@ IMPORTANT RULES:
 - If you need multiple commands, run them one at a time
 - Display results in a readable format
 
-IMPORTANT — POWERSHELL ONLY, NO WSL, NO LINUX:
-- This is a NATIVE Windows system — not WSL, not Linux, not dual-boot
-- Use exclusively PowerShell 5.1 / 7+ commands
-- FORBIDDEN: bash, wsl, apt, apt-get, systemctl, journalctl, df, free, chmod, sudo
-- NEVER suggest WSL or Linux commands as a solution or alternative
-- Windows paths: C:\, %USERPROFILE%, $env:APPDATA
-- Package managers: winget (preferred), choco or scoop
-- Services: Get-Service, Start-Service, Stop-Service
-- Processes: Get-Process, Stop-Process
-- Network: Test-NetConnection, Get-NetAdapter, ipconfig
-- Filesystem: Get-ChildItem, Copy-Item, Remove-Item
-
 TOOL USAGE:
 - Use execute_command for all system commands
 - Explain in the "explanation" field what the command does (plain language)
-- Combine commands where possible (e.g. with ;)`,
+- Combine commands where possible (e.g. with &&)`,
 
-	ToolDesc:       "Executes a PowerShell command on the Windows system and returns the output",
-	ToolArgCmd:     "The PowerShell command to execute",
+	ToolDesc:       "Executes a shell command on the Linux system and returns the output",
+	ToolArgCmd:     "The shell command to execute (bash)",
 	ToolArgExpl:    "Brief, plain-language explanation of what this command does (for the user)",
 	ExtraPromptFmt: "## Additional instructions (take precedence):\n%s\n\n---\n\n%s",
 
@@ -632,10 +617,10 @@ TOOL USAGE:
 	CmdInstallPrompt:  "Please install: ",
 	CmdRemoveDesc:     "Remove software",
 	CmdRemovePrompt:   "Please remove: ",
-	CmdUpdateDesc:     "Update programs",
-	CmdUpdateMsg:      "Please update all installed programs using winget",
+	CmdUpdateDesc:     "Update system",
+	CmdUpdateMsg:      "Please update my system (apt update && apt upgrade)",
 	CmdStatusDesc:     "Show system status",
-	CmdStatusMsg:      "Show me a compact overview of the Windows system status (running services, CPU, RAM, disk, uptime)",
+	CmdStatusMsg:      "Show me a compact overview of the system status (CPU, RAM, disk, uptime)",
 	CmdDiskDesc:       "Disk usage",
 	CmdDiskMsg:        "How much free disk space do I have?",
 	CmdMemoryDesc:     "Show memory usage",
@@ -645,34 +630,35 @@ TOOL USAGE:
 	CmdServicesDesc:   "Manage system services",
 	CmdServicesPrompt: "Service: ",
 	CmdLogsDesc:       "Show system logs",
-	CmdLogsMsg:        "Show me the most important recent Windows system events (Get-EventLog System, last 50 entries)",
+	CmdLogsMsg:        "Show me the most important recent system logs (last 20 lines)",
 	CmdOptimizeDesc:   "Optimize system",
-	CmdOptimizeMsg:    "What can I do to optimize and speed up my Windows system?",
+	CmdOptimizeMsg:    "What can I do to optimize and speed up my Debian system?",
 	CmdConfigDesc:     "Edit settings",
-	CmdSetupDesc:      "Install / uninstall winq system-wide",
+	CmdSetupDesc:      "Install / uninstall bashq system-wide",
+	CmdColorsDesc:     "Set up terminal colors in ~/.bashrc",
 	CmdActivitiesDesc: "Show activity log",
 	CmdHelpDesc:       "Show help",
 	CmdClearDesc:      "Clear chat history",
 	CmdExitDesc:       "Exit program",
 
-	HelpText: `winq – Help
+	HelpText: `bashq – Help
 
 Write in English to tell me what you need.
 I explain every step and ask before dangerous actions.
 
 SLASH COMMANDS (type / for autocomplete):
-  /install    – Install software (winget)
+  /install    – Install software
   /remove     – Remove software
-  /update     – Update programs (winget)
+  /update     – Update system
   /status     – Show system status
   /disk       – Disk usage
   /memory     – Memory usage
   /network    – Network information
   /services   – Manage services
-  /logs       – System event log
+  /logs       – System logs
   /optimize   – Optimization tips
   /config     – Settings (LLM, system prompt, shortcuts, language)
-  /setup      – Install / uninstall winq system-wide
+  /setup      – Install / uninstall bashq system-wide
   /activities – Activity log for this session
   /clear      – Clear chat
   /exit       – Exit
@@ -683,14 +669,15 @@ KEYBOARD SHORTCUTS:
   F1–F9       – Custom shortcuts (configure in /config)
   Shift+Tab   – Toggle execution mode (Ask ↔ Auto)
   Esc         – Close autocomplete
-  Ctrl+C      – Quit`,
+  Ctrl+C      – Cancel running request / command
+  Ctrl+Q      – Quit`,
 }
 
 var zh = UIStrings{
 	LangCode: "zh",
 	LangName: "中文",
 
-	TitleApp:    "winq",
+	TitleApp:    "bashq",
 	TitleConfig: "设置",
 	BadgeAuto:   " AUTO ",
 	BadgeAsk:    " ASK ",
@@ -705,6 +692,8 @@ var zh = UIStrings{
 	HintModeLabel:     "模式",
 	HintShortcutKeys:  "F1–F9/Alt+1–9",
 	HintShortcutLabel: "快捷键",
+	HintHistoryKeys:   "Alt+↑↓",
+	HintHistoryLabel:  "历史",
 	HintQuitKey:       "Ctrl+Q",
 	HintQuitLabel:     "退出",
 	ACHint:            "  ↑↓/Tab: 选择 · Enter: 确认 · Esc: 关闭",
@@ -716,9 +705,9 @@ var zh = UIStrings{
 	ConfirmCancelLabel: "取消",
 
 	LoadingThinking:   " 思考中…",
-	LoadingQuit:       "  Ctrl+C 退出",
+	LoadingQuit:       "  Ctrl+C 取消",
 	LoadingRunning:    " 正在执行：",
-	LoadingCmdRunning: "  命令运行中…",
+	LoadingCmdRunning: "  Ctrl+C 取消",
 
 	ConfigNavKeys:      "↑↓",
 	ConfigNavLabel:     "导航",
@@ -799,23 +788,23 @@ var zh = UIStrings{
 	BadgeSessionOff:    " SESSION ",
 
 	MsgUpdateAvailable:   "🔄 新版本 %s 可用。Alt+U 安装 · Esc 跳过",
-	MsgUpdateDownloading: "⬇ 正在下载 winq %s…",
-	MsgUpdateDone:        "✓ winq %s 已安装 — 请重启",
-	MsgUpdateUpToDate:    "✓ winq 已是最新版本（%s）",
+	MsgUpdateDownloading: "⬇ 正在下载 bashq %s…",
+	MsgUpdateDone:        "✓ bashq %s 已安装 — 请重启",
+	MsgUpdateUpToDate:    "✓ bashq 已是最新版本（%s）",
 	MsgUpdateError:       "⚠ 更新失败：%s",
-	MsgModeAuto:          "⚡ 模式：自动执行（命令无需确认直接运行）",
-	MsgModeAsk:           "🛡 模式：询问（执行命令前需要确认）",
-	MsgSessionOn:         "💾 会话将被保存（Alt+S 切换）",
-	MsgSessionOff:        "🚫 会话不会被保存（Alt+S 切换）",
-	MsgShortcutEmpty:     "F%d 未设置。请在 /config → 快捷键 中配置。",
-	MsgCancelled:         "✗ 已取消",
-	MsgAutoExecFmt:       "⚡ 自动: $ %s\n  %s",
-	MsgConfirmCmdFmt:     "我想执行以下命令：\n\n  $ %s\n\n%s",
-	MsgNoOutput:          "（无输出）",
-	MsgExitError:         "⚠ 退出错误：",
-	MsgToolRejected:      "错误：用户拒绝了此操作。",
+	MsgModeAuto:      "⚡ 模式：自动执行（命令无需确认直接运行）",
+	MsgModeAsk:       "🛡 模式：询问（执行命令前需要确认）",
+	MsgSessionOn:     "💾 会话将被保存（Alt+S 切换）",
+	MsgSessionOff:    "🚫 会话不会被保存（Alt+S 切换）",
+	MsgShortcutEmpty: "F%d 未设置。请在 /config → 快捷键 中配置。",
+	MsgCancelled:     "✗ 已取消",
+	MsgAutoExecFmt:   "⚡ 自动: $ %s\n  %s",
+	MsgConfirmCmdFmt: "我想执行以下命令：\n\n  $ %s\n\n%s",
+	MsgNoOutput:      "（无输出）",
+	MsgExitError:     "⚠ 退出错误：",
+	MsgToolRejected:  "错误：用户拒绝了此操作。",
 
-	WelcomeMsg:         "\n  winq 就绪 — 您的 Windows AI 助手。\n  请提问或键入 / 查看可用命令。\n",
+	WelcomeMsg:         "\n  bashq 就绪 — 终端的 Q 连续体。\n  请提问或键入 / 查看可用命令。\n",
 	LabelUser:          " 你 ",
 	LabelAssistant:     " 助手 ",
 	SessionRestoredFmt: "📂 已从 %s 恢复会话",
@@ -829,10 +818,10 @@ var zh = UIStrings{
 	KindExec:          "执行      ",
 	KindError:         "错误      ",
 
-	SystemPrompt: `你是一位友善、耐心的 Windows 助手，专门帮助没有 Windows 使用经验的用户。
+	SystemPrompt: `你是一位友善、耐心的 Linux 助手，专门帮助没有 Linux 使用经验的用户。
 
 你的任务：
-- 帮助用户管理其 Windows 系统
+- 帮助用户管理其 Debian Linux 系统
 - 用简单易懂的中文解释所有操作
 - 通过 execute_command 工具执行系统命令
 
@@ -844,25 +833,13 @@ var zh = UIStrings{
 - 如需多条命令，逐一执行
 - 以清晰易读的格式展示结果
 
-重要 — 仅使用 PowerShell，禁止 WSL 和 Linux：
-- 这是原生 Windows 系统 — 不是 WSL，不是 Linux，不是双系统
-- 只使用 PowerShell 5.1 / 7+ 命令
-- 禁止使用 bash、wsl、apt、apt-get、systemctl — 严格禁止
-- 绝不建议使用 WSL 或 Linux 命令作为解决方案
-- Windows 路径：C:\、%USERPROFILE%、$env:APPDATA
-- 包管理器：winget（优先）、choco 或 scoop
-- 服务：Get-Service、Start-Service、Stop-Service
-- 进程：Get-Process、Stop-Process
-- 网络：Test-NetConnection、Get-NetAdapter、ipconfig
-- 文件系统：Get-ChildItem、Copy-Item、Remove-Item
-
 工具使用：
 - 所有系统命令均通过 execute_command 执行
 - 在 "explanation" 字段中用简单语言说明命令的作用
-- 尽可能合并命令（例如使用 ;）`,
+- 尽可能合并命令（例如使用 &&）`,
 
-	ToolDesc:       "在 Windows 系统上执行 PowerShell 命令并返回输出",
-	ToolArgCmd:     "要执行的 PowerShell 命令",
+	ToolDesc:       "在 Linux 系统上执行 Shell 命令并返回输出",
+	ToolArgCmd:     "要执行的 Shell 命令（bash）",
 	ToolArgExpl:    "简单说明此命令的作用（给用户看的）",
 	ExtraPromptFmt: "## 附加指令（优先级更高）：\n%s\n\n---\n\n%s",
 
@@ -870,10 +847,10 @@ var zh = UIStrings{
 	CmdInstallPrompt:  "请安装：",
 	CmdRemoveDesc:     "卸载软件",
 	CmdRemovePrompt:   "请卸载：",
-	CmdUpdateDesc:     "更新程序",
-	CmdUpdateMsg:      "请使用 winget 更新所有已安装的程序",
+	CmdUpdateDesc:     "更新系统",
+	CmdUpdateMsg:      "请更新我的系统（apt update && apt upgrade）",
 	CmdStatusDesc:     "显示系统状态",
-	CmdStatusMsg:      "请简要显示 Windows 系统状态（运行中的服务、CPU、内存、磁盘、运行时间）",
+	CmdStatusMsg:      "请简要显示系统状态（CPU、内存、磁盘、运行时间）",
 	CmdDiskDesc:       "磁盘使用情况",
 	CmdDiskMsg:        "我还有多少可用磁盘空间？",
 	CmdMemoryDesc:     "显示内存使用情况",
@@ -883,34 +860,35 @@ var zh = UIStrings{
 	CmdServicesDesc:   "管理系统服务",
 	CmdServicesPrompt: "服务名称：",
 	CmdLogsDesc:       "显示系统日志",
-	CmdLogsMsg:        "请显示最近的重要 Windows 系统事件（Get-EventLog System，最近 50 条）",
+	CmdLogsMsg:        "请显示最近的重要系统日志（最后 20 行）",
 	CmdOptimizeDesc:   "系统优化",
-	CmdOptimizeMsg:    "我能做什么来优化和加速我的 Windows 系统？",
+	CmdOptimizeMsg:    "我能做什么来优化和加速我的 Debian 系统？",
 	CmdConfigDesc:     "编辑设置",
-	CmdSetupDesc:      "系统级安装 / 卸载 winq",
+	CmdSetupDesc:      "系统级安装 / 卸载 bashq",
+	CmdColorsDesc:     "配置终端颜色到 ~/.bashrc",
 	CmdActivitiesDesc: "显示活动日志",
 	CmdHelpDesc:       "显示帮助",
 	CmdClearDesc:      "清除聊天记录",
 	CmdExitDesc:       "退出程序",
 
-	HelpText: `winq – 帮助
+	HelpText: `bashq – 帮助
 
 用中文告诉我你需要什么。
 我会解释每个步骤，并在危险操作前征求确认。
 
 斜杠命令（键入 / 自动补全）：
-  /install    – 安装软件（winget）
+  /install    – 安装软件
   /remove     – 卸载软件
-  /update     – 更新程序（winget）
+  /update     – 更新系统
   /status     – 显示系统状态
   /disk       – 磁盘使用情况
   /memory     – 内存使用情况
   /network    – 网络信息
   /services   – 管理服务
-  /logs       – 系统事件日志
+  /logs       – 系统日志
   /optimize   – 优化建议
   /config     – 设置（LLM、系统提示词、快捷键、语言）
-  /setup      – 系统级安装 / 卸载 winq
+  /setup      – 系统级安装 / 卸载 bashq
   /activities – 本次会话的活动日志
   /clear      – 清除聊天
   /exit       – 退出
@@ -921,7 +899,8 @@ var zh = UIStrings{
   F1–F9       – 自定义快捷键（在 /config 中设置）
   Shift+Tab   – 切换执行模式（询问 ↔ 自动）
   Esc         – 关闭自动补全
-  Ctrl+C      – 退出`,
+  Ctrl+C      – 取消当前请求 / 命令
+  Ctrl+Q      – 退出`,
 }
 
 // supportedLangs definiert die Reihenfolge beim Durchschalten in /config.

@@ -82,6 +82,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.agent.history = msg.history
 			if len(msg.inputHistory) > 0 {
 				m.inputHistory = msg.inputHistory
+			} else {
+				// Alte Sessions ohne input_history: User-Nachrichten rekonstruieren
+				for _, cm := range msg.messages {
+					if cm.role == roleUser && cm.content != "" {
+						m.inputHistory = append(m.inputHistory, cm.content)
+					}
+				}
 			}
 			m.updateViewport()
 		}

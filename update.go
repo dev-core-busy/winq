@@ -804,9 +804,34 @@ func (m model) handleDiscoverKey(msg tea.KeyMsg) (model, tea.Cmd) {
 			}
 			m.discHost = host
 			m.discErr = ""
-			m.discStep = discScanning
 			m.input.SetValue("")
 			m.input.Placeholder = L.InputPlaceholder
+
+			// Vollständige URL (http/https): kein Scan nötig, direkt weiter
+			if strings.HasPrefix(strings.ToLower(host), "http") {
+				m.tempProfile.BaseURL = host
+				if m.discEditProfile >= 0 {
+					// Bestehendes Profil aktualisieren
+					idx := m.discEditProfile
+					m.cfg.profiles[idx].BaseURL = host
+					if m.cfg.activeProfileIdx == idx {
+						m.cfg.baseURL = host
+						m.agent.baseURL = host
+					}
+					saveConfig(m.cfg)
+					m.profileSel = idx
+					m.profileSubSel = -1
+					return m.returnToConfig()
+				}
+				m.discStep = discEnterName
+				m.input.Placeholder = L.DiscoveryNamePlaceholder
+				m.input.Focus()
+				m.recalcViewport()
+				m.viewport.SetContent(m.renderDiscoverContent())
+				return m, nil
+			}
+
+			m.discStep = discScanning
 			m.recalcViewport()
 			m.viewport.SetContent(m.renderDiscoverContent())
 			return m, tea.Batch(cmdDiscover(host), tickCmd())

@@ -42,7 +42,7 @@ func loadConfig() appConfig {
 		model:            defaultModel,
 		autoAllow:        false,
 		saveSessions:     true,
-		autoUpdate:       "ask",
+		autoUpdate:       "auto",
 		lang:             detectSystemLang(),
 		activeProfileIdx: -1,
 	}

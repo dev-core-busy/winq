@@ -38,7 +38,6 @@ func getCommands() []SlashCommand {
 		{Name: "/logs", Description: L.CmdLogsDesc, Action: actionRun, Message: L.CmdLogsMsg},
 		{Name: "/optimize", Description: L.CmdOptimizeDesc, Action: actionRun, Message: L.CmdOptimizeMsg},
 		{Name: "/config", Description: L.CmdConfigDesc, Action: actionConfig},
-		{Name: "/setup", Description: L.CmdSetupDesc, Action: actionSelfInstall},
 		{Name: "/activities", Description: L.CmdActivitiesDesc, Action: actionActivities},
 		{Name: "/help", Description: L.CmdHelpDesc, Action: actionHelp},
 		{Name: "/clear", Description: L.CmdClearDesc, Action: actionClear},

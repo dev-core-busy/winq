@@ -13,9 +13,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// configFieldCount: 0=baseURL, 1=model, 2=apiKey, 3=autoAllow, 4=customPrompt,
-// 5-13=F1-F9, 14=lang, 15=saveSessions, 16=autoUpdate
-const configFieldCount = 17
+// configFieldCount: 0=baseURL, 1=model, 2=apiKey, 3=lang, 4=autoAllow, 5=install,
+// 6=autoUpdate, 7=saveSessions, 8=customPrompt, 9-17=F1-F9
+const configFieldCount = 18
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -465,16 +465,24 @@ func (m model) handleConfigKey(msg tea.KeyMsg) (model, tea.Cmd) {
 		if m.cfgSection == 1 {
 			switch m.configSel {
 			case 3:
+				return m.cycleLang()
+			case 4:
 				m.cfg.autoAllow = !m.cfg.autoAllow
 				m.viewport.SetContent(m.renderConfigContent())
-			case 14:
-				return m.cycleLang()
-			case 15:
-				m.cfg.saveSessions = !m.cfg.saveSessions
+			case 5:
+				msg, isErr := selfInstallToggle()
+				if isErr {
+					m.addMessage(roleError, msg)
+				} else {
+					m.addMessage(roleSystem, msg)
+				}
+				m.viewport.SetContent(m.renderConfigContent())
+			case 6:
+				m.cfg.autoUpdate = cycleAutoUpdate(m.cfg.autoUpdate)
 				saveConfig(m.cfg)
 				m.viewport.SetContent(m.renderConfigContent())
-			case 16:
-				m.cfg.autoUpdate = cycleAutoUpdate(m.cfg.autoUpdate)
+			case 7:
+				m.cfg.saveSessions = !m.cfg.saveSessions
 				saveConfig(m.cfg)
 				m.viewport.SetContent(m.renderConfigContent())
 			}
@@ -514,8 +522,8 @@ func (m model) handleConfigEditKey(msg tea.KeyMsg) (model, tea.Cmd) {
 		case m.configSel == 2: // API-Key darf leer sein
 			m.cfg.apiKey = value
 			m.agent.apiKey = value
-		case m.configSel >= 5 && m.configSel <= 13:
-			m.cfg.shortcuts[m.configSel-5] = value
+		case m.configSel >= 9 && m.configSel <= 17:
+			m.cfg.shortcuts[m.configSel-9] = value
 		}
 		m.configEditing = false
 		m.input.EchoMode = textinput.EchoNormal
@@ -542,29 +550,38 @@ func (m model) handleConfigEditKey(msg tea.KeyMsg) (model, tea.Cmd) {
 
 func (m model) activateConfigField() (model, tea.Cmd) {
 	switch m.configSel {
-	case 3: // autoAllow toggle
+	case 3: // Sprache – Toggle
+		return m.cycleLang()
+
+	case 4: // Ausführmodus – Toggle
 		m.cfg.autoAllow = !m.cfg.autoAllow
 		m.viewport.SetContent(m.renderConfigContent())
 
-	case 4: // System-Prompt → Textarea-Editor öffnen
+	case 5: // Kurzbefehl (selfInstall toggle)
+		msg, isErr := selfInstallToggle()
+		if isErr {
+			m.addMessage(roleError, msg)
+		} else {
+			m.addMessage(roleSystem, msg)
+		}
+		m.viewport.SetContent(m.renderConfigContent())
+
+	case 6: // Auto-Update – Cycle
+		m.cfg.autoUpdate = cycleAutoUpdate(m.cfg.autoUpdate)
+		saveConfig(m.cfg)
+		m.viewport.SetContent(m.renderConfigContent())
+
+	case 7: // Sitzungen – Toggle
+		m.cfg.saveSessions = !m.cfg.saveSessions
+		saveConfig(m.cfg)
+		m.viewport.SetContent(m.renderConfigContent())
+
+	case 8: // System-Prompt → Textarea-Editor öffnen
 		m.promptEditor.SetWidth(m.width)
 		m.promptEditor.SetHeight(m.promptEditorHeight())
 		m.promptEditor.SetValue(m.cfg.customPrompt)
 		m.promptEditor.Focus()
 		m.state = stateEditPrompt
-
-	case 14: // Sprache – Toggle
-		return m.cycleLang()
-
-	case 15: // Sitzungen – Toggle
-		m.cfg.saveSessions = !m.cfg.saveSessions
-		saveConfig(m.cfg)
-		m.viewport.SetContent(m.renderConfigContent())
-
-	case 16: // Auto-Update – Cycle
-		m.cfg.autoUpdate = cycleAutoUpdate(m.cfg.autoUpdate)
-		saveConfig(m.cfg)
-		m.viewport.SetContent(m.renderConfigContent())
 
 	default:
 		// Einzeiliges Text-Feld
@@ -578,8 +595,8 @@ func (m model) activateConfigField() (model, tea.Cmd) {
 			value = m.cfg.apiKey
 			m.input.EchoMode = textinput.EchoPassword
 			m.input.EchoCharacter = '•'
-		case m.configSel >= 5 && m.configSel <= 13:
-			value = m.cfg.shortcuts[m.configSel-5]
+		case m.configSel >= 9 && m.configSel <= 17:
+			value = m.cfg.shortcuts[m.configSel-9]
 		}
 		m.input.SetValue(value)
 		m.input.Placeholder = ""
@@ -792,8 +809,8 @@ func (m model) configFieldLabel() string {
 		return L.FieldModel
 	case m.configSel == 2:
 		return L.FieldAPIKey
-	case m.configSel >= 5 && m.configSel <= 13:
-		return fmt.Sprintf("F%d", m.configSel-4)
+	case m.configSel >= 9 && m.configSel <= 17:
+		return fmt.Sprintf("F%d", m.configSel-8)
 	}
 	return ""
 }

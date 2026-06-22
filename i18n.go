@@ -78,7 +78,6 @@ type UIStrings struct {
 	SectionConnection string
 	SectionAssistant  string
 	SectionShortcuts  string
-	SectionLanguage   string
 
 	// Konfigurations-Feldbezeichnungen
 	FieldActiveProfile string // "Aktives Profil"
@@ -89,9 +88,7 @@ type UIStrings struct {
 	FieldPrompt        string
 	FieldLang          string
 	FieldSession       string // "Sitzungen speichern"
-	SectionSession     string // "── SITZUNGEN ────────────────────────"
 	FieldAutoUpdate    string // "Auto-Update"
-	SectionUpdate      string // "── AUTO-UPDATE ──────────────────────"
 
 	// Konfigurationswerte
 	FieldAPIKeyEmpty   string // "(leer – für lokale LLMs)"
@@ -102,9 +99,12 @@ type UIStrings struct {
 	ModeToggleHint     string // "(Space/Enter)"
 	ModeSessionOn      string // "An"
 	ModeSessionOff     string // "Aus"
-	ModeUpdateAsk      string // "Nachfragen"
-	ModeUpdateAuto     string // "Automatisch"
-	ModeUpdateOff      string // "Deaktiviert"
+	ModeUpdateAsk       string // "Nachfragen"
+	ModeUpdateAuto      string // "Automatisch"
+	ModeUpdateOff       string // "Deaktiviert"
+	FieldInstall        string // "Kurzbefehl"
+	ModeInstalled       string // "Installiert"
+	ModeNotInstalled    string // "Nicht installiert"
 
 	// Titel-Badges
 	BadgeSessionOn  string // " SESSION "
@@ -270,9 +270,8 @@ var de = UIStrings{
 
 	SectionProfiles:   "── LLM-PROFILE ──────────────────────",
 	SectionConnection: "── VERBINDUNG ───────────────────────",
-	SectionAssistant:  "── ASSISTENT ────────────────────────",
+	SectionAssistant:  "── Einstellungen ────────────────────",
 	SectionShortcuts:  "── TASTENKÜRZEL (F1–F9) ─────────────",
-	SectionLanguage:   "── SPRACHE ──────────────────────────",
 
 	ProfileActive:       "● aktiv",
 	ProfilePreferred:    "★",
@@ -306,11 +305,12 @@ var de = UIStrings{
 	FieldAPIKey:        "API-Key",
 	FieldMode:          "Ausführmodus",
 	FieldPrompt:        "System-Prompt",
-	FieldLang:          "Sprache",
-	FieldSession:       "Sitzungen speichern",
-	SectionSession:     "── SITZUNGEN ────────────────────────",
-	FieldAutoUpdate:    "Auto-Update",
-	SectionUpdate:      "── AUTO-UPDATE ──────────────────────",
+	FieldLang:           "Sprache",
+	FieldSession:        "Sitzungen speichern",
+	FieldAutoUpdate:     "Auto-Update",
+	FieldInstall:        "Kurzbefehl",
+	ModeInstalled:       "Installiert",
+	ModeNotInstalled:    "Nicht installiert",
 
 	FieldAPIKeyEmpty:   "(leer – für lokale LLMs)",
 	FieldPromptEmpty:   "(leer – Enter zum Bearbeiten)",
@@ -438,7 +438,6 @@ SLASH-BEFEHLE (tippe / für Autovervollständigung):
   /logs       – Systemereignisse anzeigen
   /optimize   – Optimierungstipps
   /config     – Einstellungen (LLM, System-Prompt, Tastenkürzel, Sprache)
-  /setup      – winq systemweit installieren / deinstallieren
   /activities – Aktivitätsprotokoll dieser Sitzung
   /clear      – Chat leeren
   /exit       – Beenden
@@ -512,9 +511,8 @@ var en = UIStrings{
 
 	SectionProfiles:   "── LLM PROFILES ─────────────────────",
 	SectionConnection: "── CONNECTION ───────────────────────",
-	SectionAssistant:  "── ASSISTANT ────────────────────────",
+	SectionAssistant:  "── Settings ─────────────────────────",
 	SectionShortcuts:  "── SHORTCUTS (F1–F9) ────────────────",
-	SectionLanguage:   "── LANGUAGE ─────────────────────────",
 
 	ProfileActive:       "● active",
 	ProfilePreferred:    "★",
@@ -548,11 +546,12 @@ var en = UIStrings{
 	FieldAPIKey:        "API Key",
 	FieldMode:          "Exec mode",
 	FieldPrompt:        "System prompt",
-	FieldLang:          "Language",
-	FieldSession:       "Save sessions",
-	SectionSession:     "── SESSIONS ─────────────────────────",
-	FieldAutoUpdate:    "Auto-update",
-	SectionUpdate:      "── AUTO-UPDATE ──────────────────────",
+	FieldLang:           "Language",
+	FieldSession:        "Save sessions",
+	FieldAutoUpdate:     "Auto-update",
+	FieldInstall:        "Shortcut cmd",
+	ModeInstalled:       "Installed",
+	ModeNotInstalled:    "Not installed",
 
 	FieldAPIKeyEmpty:   "(empty – for local LLMs)",
 	FieldPromptEmpty:   "(empty – press Enter to edit)",
@@ -680,7 +679,6 @@ SLASH COMMANDS (type / for autocomplete):
   /logs       – System event log
   /optimize   – Optimization tips
   /config     – Settings (LLM, system prompt, shortcuts, language)
-  /setup      – Install / uninstall winq system-wide
   /activities – Activity log for this session
   /clear      – Clear chat
   /exit       – Exit
@@ -754,9 +752,8 @@ var zh = UIStrings{
 
 	SectionProfiles:   "── LLM 配置文件 ──────────────────────",
 	SectionConnection: "── 连接 ─────────────────────────────",
-	SectionAssistant:  "── 助手 ─────────────────────────────",
+	SectionAssistant:  "── 设置 ─────────────────────────────",
 	SectionShortcuts:  "── 快捷键 (F1–F9) ───────────────────",
-	SectionLanguage:   "── 语言 ─────────────────────────────",
 
 	ProfileActive:       "● 激活",
 	ProfilePreferred:    "★",
@@ -790,11 +787,12 @@ var zh = UIStrings{
 	FieldAPIKey:        "API 密钥",
 	FieldMode:          "执行模式",
 	FieldPrompt:        "系统提示词",
-	FieldLang:          "语言",
-	FieldSession:       "保存会话",
-	SectionSession:     "── 会话 ─────────────────────────────",
-	FieldAutoUpdate:    "自动更新",
-	SectionUpdate:      "── 自动更新 ──────────────────────────",
+	FieldLang:           "语言",
+	FieldSession:        "保存会话",
+	FieldAutoUpdate:     "自动更新",
+	FieldInstall:        "快捷命令",
+	ModeInstalled:       "已安装",
+	ModeNotInstalled:    "未安装",
 
 	FieldAPIKeyEmpty:   "（空 – 本地 LLM 不需要）",
 	FieldPromptEmpty:   "（空 – 按 Enter 编辑）",
@@ -922,7 +920,6 @@ var zh = UIStrings{
   /logs       – 系统事件日志
   /optimize   – 优化建议
   /config     – 设置（LLM、系统提示词、快捷键、语言）
-  /setup      – 系统级安装 / 卸载 winq
   /activities – 本次会话的活动日志
   /clear      – 清除聊天
   /exit       – 退出

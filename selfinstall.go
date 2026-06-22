@@ -12,6 +12,14 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+// selfInstallIsInstalled prüft ob winq unter %LOCALAPPDATA%\Programs\winq installiert ist.
+func selfInstallIsInstalled() bool {
+	installDir := filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", "winq")
+	target := filepath.Join(installDir, "winq.exe")
+	_, err := os.Stat(target)
+	return err == nil
+}
+
 func selfInstallToggle() (msg string, isErr bool) {
 	exe, err := os.Executable()
 	if err != nil {

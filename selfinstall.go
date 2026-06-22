@@ -63,6 +63,7 @@ func addToUserPath(dir string) error {
 		return err
 	}
 	defer k.Close()
+	// GetStringValue liest sowohl REG_SZ als auch REG_EXPAND_SZ korrekt.
 	current, _, err := k.GetStringValue("Path")
 	if err != nil {
 		current = ""
@@ -75,7 +76,8 @@ func addToUserPath(dir string) error {
 		newPath += ";"
 	}
 	newPath += dir
-	return k.SetStringValue("Path", newPath)
+	// REG_EXPAND_SZ beibehalten — Windows erwartet diesen Typ für PATH.
+	return k.SetExpandStringValue("Path", newPath)
 }
 
 func removeFromUserPath(dir string) error {
@@ -95,5 +97,5 @@ func removeFromUserPath(dir string) error {
 			filtered = append(filtered, p)
 		}
 	}
-	return k.SetStringValue("Path", strings.Join(filtered, ";"))
+	return k.SetExpandStringValue("Path", strings.Join(filtered, ";"))
 }

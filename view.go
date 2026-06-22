@@ -288,6 +288,11 @@ func (m model) renderEditPromptBottom() string {
 func (m model) renderDiscoverBottom() string {
 	switch m.discStep {
 	case discEnterHost:
+		if m.discEditProfile >= 0 && m.discErr != "" {
+			// Fehler bei Profil-Modellsuche: nur Esc anbieten
+			hint := "  " + hintKeyStyle.Render("Esc") + hintStyle.Render(" "+L.ConfigCancelLabel)
+			return hint + "\n"
+		}
 		label := hintStyle.Render("  "+L.DiscoveryInputLabel+": ") + m.input.View()
 		hint := "  " + hintKeyStyle.Render("Enter") + hintStyle.Render(" "+L.DiscoverySearchLabel+"  ") +
 			hintKeyStyle.Render("Esc") + hintStyle.Render(" "+L.ConfigCancelLabel)
@@ -323,7 +328,9 @@ func (m model) renderDiscoverContent() string {
 		if m.discErr != "" {
 			sb.WriteString(errorMsgStyle.Render("  ✗ "+m.discErr) + "\n\n")
 		}
-		sb.WriteString("  " + dimStyle.Render(L.DiscoveryInputHint) + "\n")
+		if m.discEditProfile < 0 {
+			sb.WriteString("  " + dimStyle.Render(L.DiscoveryInputHint) + "\n")
+		}
 
 	case discScanning:
 		sb.WriteString("  " + dimStyle.Render(L.DiscoveryScanPorts) + "\n")

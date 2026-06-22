@@ -278,8 +278,13 @@ func (m *model) bottomLines() int {
 		return 2 // hints
 	case stateDiscover:
 		switch m.discStep {
-		case discEnterHost, discEnterName:
+		case discEnterHost:
+			if m.discEditProfile >= 0 && m.discErr != "" {
+				return 2 // Fehlermeldung im View, nur Esc-Hint unten
+			}
 			return 3 // label+input, hint, trailing newline
+		case discEnterName:
+			return 3
 		default:
 			return 2 // spinner/nav + hint
 		}

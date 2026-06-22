@@ -159,9 +159,10 @@ type UIStrings struct {
 	ProfileAddBtn       string // "[ + Neues LLM-Profil ]"
 	ProfileTabSettings  string // "Tab: Einstellungen"
 	ProfileTabProfiles  string // "Tab: Profile"
-	ProfilePreferLabel  string // "bevorzugen"
-	ProfileDeleteLabel  string // "löschen"
-	ProfileActivatedFmt string // "Profil '%s' aktiviert"
+	ProfilePreferLabel   string // "bevorzugen"
+	ProfileDeleteLabel   string // "löschen"
+	ProfileModelDiscover string // "Modelle suchen"
+	ProfileActivatedFmt  string // "Profil '%s' aktiviert"
 
 	// Discovery (stateDiscover)
 	DiscoveryTitle           string
@@ -278,9 +279,10 @@ var de = UIStrings{
 	ProfileAddBtn:       "[ + Neues LLM-Profil ]",
 	ProfileTabSettings:  "Tab: Einstellungen",
 	ProfileTabProfiles:  "Tab: Profile",
-	ProfilePreferLabel:  "bevorzugen",
-	ProfileDeleteLabel:  "löschen",
-	ProfileActivatedFmt: "Profil '%s' aktiviert",
+	ProfilePreferLabel:   "bevorzugen",
+	ProfileDeleteLabel:   "löschen",
+	ProfileModelDiscover: "Modelle suchen",
+	ProfileActivatedFmt:  "Profil '%s' aktiviert",
 
 	DiscoveryTitle:           "Neues LLM-Profil",
 	DiscoveryInputLabel:      "IP/Hostname",
@@ -519,9 +521,10 @@ var en = UIStrings{
 	ProfileAddBtn:       "[ + New LLM Profile ]",
 	ProfileTabSettings:  "Tab: Settings",
 	ProfileTabProfiles:  "Tab: Profiles",
-	ProfilePreferLabel:  "prefer",
-	ProfileDeleteLabel:  "delete",
-	ProfileActivatedFmt: "Profile '%s' activated",
+	ProfilePreferLabel:   "prefer",
+	ProfileDeleteLabel:   "delete",
+	ProfileModelDiscover: "Search models",
+	ProfileActivatedFmt:  "Profile '%s' activated",
 
 	DiscoveryTitle:           "New LLM Profile",
 	DiscoveryInputLabel:      "IP/Hostname",
@@ -760,9 +763,10 @@ var zh = UIStrings{
 	ProfileAddBtn:       "[ + 新建 LLM 配置文件 ]",
 	ProfileTabSettings:  "Tab: 设置",
 	ProfileTabProfiles:  "Tab: 配置文件",
-	ProfilePreferLabel:  "首选",
-	ProfileDeleteLabel:  "删除",
-	ProfileActivatedFmt: "配置文件 '%s' 已激活",
+	ProfilePreferLabel:   "首选",
+	ProfileDeleteLabel:   "删除",
+	ProfileModelDiscover: "搜索模型",
+	ProfileActivatedFmt:  "配置文件 '%s' 已激活",
 
 	DiscoveryTitle:           "新建 LLM 配置文件",
 	DiscoveryInputLabel:      "IP/主机名",

@@ -14,7 +14,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-const currentVersion = "v1.0.2"
+const currentVersion = "v1.0.3"
 const githubReleasesAPI = "https://api.github.com/repos/dev-core-busy/winq/releases/latest"
 
 type updateInfo struct {

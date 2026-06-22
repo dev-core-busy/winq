@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
+	"unsafe"
 
 	"golang.org/x/sys/windows/registry"
 )
@@ -27,6 +29,7 @@ func selfInstallToggle() (msg string, isErr bool) {
 		if err := removeFromUserPath(installDir); err != nil {
 			return fmt.Sprintf("✓ winq deinstalliert (PATH-Eintrag konnte nicht entfernt werden: %v)", err), false
 		}
+		broadcastEnvChange()
 		return "✓ winq deinstalliert", false
 	}
 
@@ -39,6 +42,7 @@ func selfInstallToggle() (msg string, isErr bool) {
 	if err := addToUserPath(installDir); err != nil {
 		return fmt.Sprintf("✓ %s\n  ⚠ PATH-Eintrag fehlgeschlagen: %v", target, err), false
 	}
+	broadcastEnvChange()
 	return fmt.Sprintf("✓ %s\n  Neues Terminal öffnen damit PATH aktiv wird", target), false
 }
 
@@ -98,4 +102,22 @@ func removeFromUserPath(dir string) error {
 		}
 	}
 	return k.SetExpandStringValue("Path", strings.Join(filtered, ";"))
+}
+
+// broadcastEnvChange benachrichtigt laufende Prozesse (Explorer, Taskleiste)
+// über die geänderte Umgebungsvariable — ohne dies sehen neue Terminals
+// den aktualisierten PATH erst nach einem Neustart.
+func broadcastEnvChange() {
+	user32 := syscall.NewLazyDLL("user32.dll")
+	sendMsg := user32.NewProc("SendMessageTimeoutW")
+	env, _ := syscall.UTF16PtrFromString("Environment")
+	sendMsg.Call(
+		0xffff,                       // HWND_BROADCAST
+		0x001a,                       // WM_SETTINGCHANGE
+		0,
+		uintptr(unsafe.Pointer(env)),
+		0x0002,                       // SMTO_ABORTIFHUNG
+		5000,                         // Timeout ms
+		0,
+	)
 }

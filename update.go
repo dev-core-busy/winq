@@ -120,6 +120,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "auto":
 				m.addMessage(roleSystem, fmt.Sprintf(L.MsgUpdateDownloading, msg.info.version))
 				m.updateViewport()
+				// Download startet; nach Abschluss übernimmt updateDoneMsg die Kette
 				return m, cmdDownloadUpdate(*msg.info)
 			default: // "ask"
 				m.pendingUpdate = msg.info
@@ -127,8 +128,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.updateViewport()
 			}
 		}
-		// nächste Prüfung in 30 Minuten einplanen
+		// Nächste Prüfung in 30 Minuten einplanen
 		if m.cfg.autoUpdate != "off" {
+			m.nextUpdateAt = time.Now().Add(30 * time.Minute)
 			return m, cmdScheduleUpdateCheck()
 		}
 		return m, nil
@@ -137,6 +139,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.err != nil {
 			m.addMessage(roleError, fmt.Sprintf(L.MsgUpdateError, msg.err.Error()))
 			m.updateViewport()
+			// Kette nach Fehler weiterlaufen lassen
+			if m.cfg.autoUpdate != "off" {
+				m.nextUpdateAt = time.Now().Add(30 * time.Minute)
+				return m, cmdScheduleUpdateCheck()
+			}
 			return m, nil
 		}
 		if m.cfg.autoUpdate == "auto" {
@@ -144,8 +151,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			restartExecPath = msg.execPath
 			return m, tea.Quit
 		}
+		// ask-Modus: manuelles Update fertig — Kette neu starten
 		m.addMessage(roleSystem, fmt.Sprintf(L.MsgUpdateDone, msg.version))
 		m.updateViewport()
+		if m.cfg.autoUpdate != "off" {
+			m.nextUpdateAt = time.Now().Add(30 * time.Minute)
+			return m, cmdScheduleUpdateCheck()
+		}
 		return m, nil
 
 	case scheduleUpdateCheckMsg:
@@ -1302,6 +1314,18 @@ func cmdDiscoverModels(baseURL, apiKey string) tea.Cmd {
 	return func() tea.Msg {
 		models, authFailed := probeURLWithAuth(baseURL, apiKey)
 		return discoveryResultMsg{models: models, authFailed: authFailed}
+	}
+}
+
+// cmdInitSize fragt die aktuelle Terminal-Größe ab und schickt sofort ein WindowSizeMsg.
+// Verhindert den Startup-Hänger auf Windows, wenn das Terminal das Resize-Event verzögert sendet.
+func cmdInitSize() tea.Cmd {
+	return func() tea.Msg {
+		w, h := terminalSize()
+		if w <= 0 || h <= 0 {
+			w, h = 80, 24
+		}
+		return tea.WindowSizeMsg{Width: w, Height: h}
 	}
 }
 

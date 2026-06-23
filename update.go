@@ -148,7 +148,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if m.cfg.autoUpdate == "auto" {
 			restartAfterUpdate = true
-			restartExecPath = msg.execPath
+			updatedToVersion = msg.version
 			return m, tea.Quit
 		}
 		// ask-Modus: manuelles Update fertig — Kette neu starten

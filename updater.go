@@ -14,7 +14,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-const currentVersion = "v1.0.6"
+const currentVersion = "v1.0.7"
 const githubReleasesAPI = "https://api.github.com/repos/dev-core-busy/winq/releases/latest"
 
 type updateInfo struct {
@@ -28,9 +28,8 @@ type updateCheckMsg struct {
 }
 
 type updateDoneMsg struct {
-	version  string
-	execPath string // Pfad der Binary VOR dem Rename, für syscall.Exec
-	err      error
+	version string
+	err     error
 }
 
 // scheduleUpdateCheckMsg feuert nach 30 Minuten Wartezeit.
@@ -142,7 +141,7 @@ func cmdDownloadUpdate(info updateInfo) tea.Cmd {
 		}
 		os.Remove(oldFile)
 
-		return updateDoneMsg{version: info.version, execPath: exe}
+		return updateDoneMsg{version: info.version}
 	}
 }
 

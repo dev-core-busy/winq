@@ -3,16 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// restartAfterUpdate + restartExecPath: gesetzt nach erfolgreichem auto-update.
-// Der Pfad wird VOR dem Rename gesichert, damit /proc/self/exe nicht auf einen
-// gelöschten Inode zeigt wenn syscall.Exec aufgerufen wird.
+// Nach erfolgreichem Auto-Update: winq beendet sich und druckt diese Meldung
+// ins normale Terminal. Kein Auto-Restart — Windows-Console-Handles werden beim
+// Prozesswechsel unzuverlässig, was die neue Instanz taub für Tastatureingaben macht.
 var restartAfterUpdate bool
-var restartExecPath string
+var updatedToVersion string
 
 func main() {
 	p := tea.NewProgram(
@@ -24,16 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if restartAfterUpdate && restartExecPath != "" {
-		cmd := exec.Command(restartExecPath, os.Args[1:]...)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Start(); err != nil {
-			fmt.Fprintln(os.Stderr, "winq Neustart fehlgeschlagen:", err)
-			fmt.Fprintln(os.Stderr, "Bitte manuell neu starten:", restartExecPath)
-			os.Exit(1)
-		}
-		os.Exit(0)
+	if restartAfterUpdate {
+		fmt.Printf("\n  ✓ winq %s installiert — bitte winq neu starten.\n\n", updatedToVersion)
 	}
 }

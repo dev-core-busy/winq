@@ -112,6 +112,16 @@ func probeURLWithAuth(rawURL, apiKey string) ([]foundModel, bool) {
 		}
 	}
 
+	// Gemini-Fallback: bei Google-URLs immer die echte Gemini-Models-API befragen.
+	// api.google.com/genai/* und ähnliche Google-URLs leiten intern auf
+	// generativelanguage.googleapis.com weiter – direkte Abfrage nötig.
+	if apiKey != "" && strings.Contains(strings.ToLower(u.Host), "google") {
+		if models := fetchGeminiModels(apiKey); len(models) > 0 {
+			// rawURL als BaseURL beibehalten – wird für echte API-Calls genutzt
+			return toFoundModels(models, rawURL, rawURL), false
+		}
+	}
+
 	return nil, authFailed
 }
 
@@ -121,6 +131,47 @@ func toFoundModels(names []string, baseURL, source string) []foundModel {
 		result[i] = foundModel{Name: name, BaseURL: baseURL, Source: source}
 	}
 	return result
+}
+
+// fetchGeminiModels fragt direkt die Gemini-Models-API mit ?key= ab.
+// Wird als Fallback für google.com-URLs genutzt, die kein OpenAI-Endpoint haben.
+func fetchGeminiModels(apiKey string) []string {
+	geminiURL := "https://generativelanguage.googleapis.com/v1beta/models?key=" + url.QueryEscape(apiKey)
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Get(geminiURL)
+	if err != nil || resp.StatusCode >= 400 {
+		if resp != nil {
+			resp.Body.Close()
+		}
+		return nil
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil
+	}
+	var data struct {
+		Models []struct {
+			Name                       string   `json:"name"`
+			SupportedGenerationMethods []string `json:"supportedGenerationMethods"`
+		} `json:"models"`
+	}
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil
+	}
+	out := make([]string, 0, len(data.Models))
+	for _, m := range data.Models {
+		for _, method := range m.SupportedGenerationMethods {
+			if method == "generateContent" {
+				name := strings.TrimPrefix(m.Name, "models/")
+				if name != "" {
+					out = append(out, name)
+				}
+				break
+			}
+		}
+	}
+	return out
 }
 
 // fetchGoogleAPIKey probiert Google-spezifische API-Key-Authentifizierung:

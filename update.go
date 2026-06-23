@@ -1044,6 +1044,16 @@ func (m model) submitInput() (model, tea.Cmd) {
 	if text == "" {
 		return m, nil
 	}
+
+	// Slash-Befehl direkt ausführen (z.B. aus History gewählt, ohne AC)
+	if strings.HasPrefix(text, "/") {
+		for _, cmd := range getCommands() {
+			if cmd.Name == text {
+				return m.selectCommand(cmd)
+			}
+		}
+	}
+
 	// History: doppelte aufeinanderfolgende Einträge vermeiden
 	if len(m.inputHistory) == 0 || m.inputHistory[len(m.inputHistory)-1] != text {
 		m.inputHistory = append(m.inputHistory, text)

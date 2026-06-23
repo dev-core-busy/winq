@@ -432,6 +432,7 @@ func (m model) renderConfigContent() string {
 			sb.WriteString(m.renderProfileSubField(L.FieldEndpoint, p.BaseURL, 0, false))
 			sb.WriteString(m.renderProfileSubField(L.FieldModel, p.Model, 1, false))
 			sb.WriteString(m.renderProfileSubField(L.FieldAPIKey, apiDisp, 2, true))
+			sb.WriteString(m.renderProfileSubField(L.FieldProfileName, p.Name, 3, false))
 		}
 	}
 	// "Add"-Button

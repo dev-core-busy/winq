@@ -39,6 +39,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case tea.MouseMsg:
+		switch msg.Button {
+		case tea.MouseButtonWheelDown:
+			m.viewport.LineDown(3)
+		case tea.MouseButtonWheelUp:
+			m.viewport.LineUp(3)
+		}
+		return m, nil
+
 	case agentResponseMsg:
 		return m.handleAgentResponse(msg.resp)
 

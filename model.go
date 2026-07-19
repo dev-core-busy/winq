@@ -131,6 +131,7 @@ type model struct {
 	// Retry bei LLM-Fehler
 	canRetry          bool
 	retryIsToolResult bool
+	retryIsCompact    bool
 	retryMsg          string
 	retryToolID       string
 	retryToolOutput   string

@@ -196,6 +196,10 @@ func (m model) renderIdleBottom() string {
 		return acBlock + "\n" + inputLine + "\n" + hintStyle.Render(L.ACHint)
 	}
 
+	if m.canRetry {
+		return inputLine + "\n" + hintStyle.Render(L.RetryHint)
+	}
+
 	hint := hintStyle.Render("  ") +
 		hintKeyStyle.Render(L.HintSlashKey) + hintStyle.Render(" "+L.HintSlashLabel+"  ") +
 		hintKeyStyle.Render(L.HintScrollKeys) + hintStyle.Render(" "+L.HintScrollLabel+"  ") +
@@ -507,14 +511,19 @@ func (m model) renderConfigContent() string {
 	sb.WriteString(m.renderConfigField(4, L.FieldSession, sessVal+" "+dimStyle.Render(L.ModeToggleHint), true))
 	sb.WriteString("\n")
 
-	// Feld 5: System-Prompt
+	// Feld 5: LLM-Timeout
+	timeoutVal := fmt.Sprintf("%d %s", m.cfg.llmTimeout, L.FieldTimeoutHint)
+	sb.WriteString(m.renderConfigField(5, L.FieldTimeout, timeoutVal, false))
+	sb.WriteString("\n")
+
+	// Feld 6: System-Prompt
 	promptPreview := m.cfg.customPrompt
 	if promptPreview == "" {
 		promptPreview = L.FieldPromptEmpty
 	} else if len(promptPreview) > 40 {
 		promptPreview = promptPreview[:40] + "…"
 	}
-	sb.WriteString(m.renderConfigField(5, L.FieldPrompt, promptPreview, false))
+	sb.WriteString(m.renderConfigField(6, L.FieldPrompt, promptPreview, false))
 	sb.WriteString("\n")
 
 	// TASTENKÜRZEL / SHORTCUTS
@@ -524,7 +533,7 @@ func (m model) renderConfigContent() string {
 		if val == "" {
 			val = L.FieldShortcutEmpty
 		}
-		sb.WriteString(m.renderConfigField(6+i, fmt.Sprintf("F%d", i+1), val, false))
+		sb.WriteString(m.renderConfigField(7+i, fmt.Sprintf("F%d", i+1), val, false))
 	}
 	sb.WriteString("\n")
 

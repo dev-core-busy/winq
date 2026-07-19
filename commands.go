@@ -7,13 +7,14 @@ type cmdAction int
 const (
 	actionRun          cmdAction = iota // Sofort als Nachricht an Agent senden
 	actionPrompt                        // Eingabefeld mit Prefix füllen
-	actionClear                         // Chat leeren
+	actionClearHistory                  // Chat und LLM-Verlauf leeren
+	actionCompact                       // LLM-Kontext komprimieren (Zusammenfassung)
 	actionExit                          // Beenden
 	actionHelp                          // Hilfe anzeigen
 	actionConfig                        // Konfigurationseditor öffnen
 	actionActivities                    // Aktivitätsprotokoll anzeigen
-	actionSelfInstall                   // bashq system-weit installieren / deinstallieren
-	actionColors                        // Terminal-Farben in ~/.bashrc einrichten
+	actionSelfInstall                   // winq system-weit installieren / deinstallieren
+	actionColors                        // Terminal-Farben einrichten (nur Linux)
 )
 
 type SlashCommand struct {
@@ -40,7 +41,8 @@ func getCommands() []SlashCommand {
 		{Name: "/config", Description: L.CmdConfigDesc, Action: actionConfig},
 		{Name: "/activities", Description: L.CmdActivitiesDesc, Action: actionActivities},
 		{Name: "/help", Description: L.CmdHelpDesc, Action: actionHelp},
-		{Name: "/clear", Description: L.CmdClearDesc, Action: actionClear},
+		{Name: "/clear-history", Description: L.CmdClearDesc, Action: actionClearHistory},
+		{Name: "/compact", Description: L.CmdCompactDesc, Action: actionCompact},
 		{Name: "/exit", Description: L.CmdExitDesc, Action: actionExit},
 	}
 }

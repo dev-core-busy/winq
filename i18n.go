@@ -362,7 +362,7 @@ var de = UIStrings{
 	MsgToolRejected:      "FEHLER: Der Benutzer hat die Ausführung abgelehnt.",
 	RetryHint:            "  ↩ Nochmals versuchen · Esc: Verwerfen",
 	MsgCompacting:        "📦 Komprimiere LLM-Kontext…",
-	MsgCompactedFmt:      "📦 Kontext komprimiert · %d Nachrichten\n\n  %s",
+	MsgCompactedFmt:      "📦 Kontext komprimiert · %d Nachrichten",
 	CompactPrompt:        "Fasse unsere bisherige Unterhaltung in 3–5 prägnanten Sätzen zusammen. Nenne alle wichtigen Befehle, Systemzustände und Erkenntnisse. Antworte ausschließlich mit der Zusammenfassung, ohne Einleitung oder Kommentar.",
 
 	WelcomeMsg:         "\n  winq bereit – dein KI-Assistent für Windows.\n  Stell mir eine Frage oder tippe / für verfügbare Befehle.\n",
@@ -618,7 +618,7 @@ var en = UIStrings{
 	MsgToolRejected:      "ERROR: The user rejected the execution.",
 	RetryHint:            "  ↩ Retry · Esc: Dismiss",
 	MsgCompacting:        "📦 Compressing LLM context…",
-	MsgCompactedFmt:      "📦 Context compacted · %d messages\n\n  %s",
+	MsgCompactedFmt:      "📦 Context compacted · %d messages",
 	CompactPrompt:        "Summarize our conversation so far in 3–5 concise sentences. Include all important commands, system states, and findings. Respond with the summary only, without any introduction or comment.",
 
 	WelcomeMsg:         "\n  winq ready — your AI assistant for Windows.\n  Ask me anything or type / for available commands.\n",
@@ -873,7 +873,7 @@ var zh = UIStrings{
 	MsgToolRejected:      "错误：用户拒绝了此操作。",
 	RetryHint:            "  ↩ 重试 · Esc：取消",
 	MsgCompacting:        "📦 正在压缩 LLM 上下文…",
-	MsgCompactedFmt:      "📦 上下文已压缩 · %d 条消息\n\n  %s",
+	MsgCompactedFmt:      "📦 上下文已压缩 · %d 条消息",
 	CompactPrompt:        "请用3–5句话总结我们迄今为止的对话。包括所有重要的命令、系统状态和发现。只回复摘要，不需要介绍或评论。",
 
 	WelcomeMsg:         "\n  winq 就绪 — 您的 Windows AI 助手。\n  请提问或键入 / 查看可用命令。\n",

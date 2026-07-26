@@ -72,6 +72,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case compactDoneMsg:
 		m.state = stateIdle
+		// Ohne diesen Reset blieb retryIsCompact für den Rest der Sitzung gesetzt
+		// und jeder spätere Retry komprimierte statt die Anfrage zu wiederholen.
+		m.clearRetryState()
 		m.addMessage(roleSystem, fmt.Sprintf(L.MsgCompactedFmt, msg.msgCount))
 		m.updateViewport()
 		return m, nil
@@ -112,29 +115,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
-	case sessionLoadedMsg:
-		// Bereits gespeicherte Sitzung laden – nur wenn Chat noch leer ist
-		if len(m.messages) == 0 {
-			header := chatMessage{
-				role:    roleSystem,
-				content: fmt.Sprintf(L.SessionRestoredFmt, msg.savedAt),
-			}
-			m.messages = append([]chatMessage{header}, msg.messages...)
-			m.agent.history = msg.history
-			if len(msg.inputHistory) > 0 {
-				m.inputHistory = msg.inputHistory
-			} else {
-				// Alte Sessions ohne input_history: User-Nachrichten rekonstruieren
-				for _, cm := range msg.messages {
-					if cm.role == roleUser && cm.content != "" {
-						m.inputHistory = append(m.inputHistory, cm.content)
-					}
-				}
-			}
-			m.updateViewport()
-		}
-		return m, nil
-
 	case updateCheckMsg:
 		if msg.err == nil && msg.info != nil {
 			switch m.cfg.autoUpdate {
@@ -170,6 +150,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.cfg.autoUpdate == "auto" {
 			restartAfterUpdate = true
 			updatedToVersion = msg.version
+			// Beenden ohne Speichern hätte den letzten Dialogschritt verloren.
+			if m.cfg.saveSessions {
+				saveSession(m.messages, m.agent.history, m.inputHistory)
+			}
 			return m, tea.Quit
 		}
 		// ask-Modus: manuelles Update fertig — Kette neu starten
@@ -235,6 +219,8 @@ func cmdReadClipboard() tea.Cmd {
 
 // sanitizeClipboard bereitet Text für ein einzeiliges Eingabefeld auf:
 // Zeilenumbrüche und Tabs werden zu Leerzeichen, sonstige Steuerzeichen entfernt.
+// Rand-Leerzeichen bleiben erhalten (der Aufrufer trimmt bei Bedarf), damit ein
+// bewusst mitkopiertes Leerzeichen als Worttrenner nicht verschluckt wird.
 func sanitizeClipboard(s string) string {
 	var sb strings.Builder
 	lastSpace := false
@@ -254,7 +240,7 @@ func sanitizeClipboard(s string) string {
 			lastSpace = false
 		}
 	}
-	return strings.TrimSpace(sb.String())
+	return sb.String()
 }
 
 // handlePaste fügt Text aus der Zwischenablage an der Cursorposition ein.
@@ -266,11 +252,15 @@ func (m model) handlePaste(text string) (tea.Model, tea.Cmd) {
 	// Mehrzeiliger System-Prompt-Editor: Umbrüche bleiben erhalten
 	if m.state == stateEditPrompt {
 		m.promptEditor.InsertString(strings.ReplaceAll(text, "\r\n", "\n"))
-		return m, nil
+		// Erzwingt textarea.repositionView, damit die Ansicht bei einem
+		// Einfügen, das den Cursor aus dem sichtbaren Bereich schiebt, mitspringt.
+		var cmd tea.Cmd
+		m.promptEditor, cmd = m.promptEditor.Update(nil)
+		return m, cmd
 	}
 
 	clean := sanitizeClipboard(text)
-	if clean == "" {
+	if strings.TrimSpace(clean) == "" {
 		return m, nil
 	}
 
@@ -279,8 +269,16 @@ func (m model) handlePaste(text string) (tea.Model, tea.Cmd) {
 	if pos > len(runes) {
 		pos = len(runes)
 	}
-	m.input.SetValue(string(runes[:pos]) + clean + string(runes[pos:]))
-	m.input.SetCursor(pos + len([]rune(clean)))
+	ins := []rune(clean)
+	if lim := m.input.CharLimit; lim > 0 {
+		if avail := lim - len(runes); avail <= 0 {
+			ins = nil
+		} else if avail < len(ins) {
+			ins = ins[:avail]
+		}
+	}
+	m.input.SetValue(string(runes[:pos]) + string(ins) + string(runes[pos:]))
+	m.input.SetCursor(pos + len(ins))
 
 	if m.state == stateIdle {
 		if m.canRetry && m.input.Value() != "" {
@@ -418,6 +416,7 @@ func (m model) triggerShortcut(idx int) (model, tea.Cmd) {
 	m.updateViewport()
 	m.state = stateLoading
 	m.logActivity(actUser, fmt.Sprintf("[F%d] %s", idx+1, msg))
+	m.setRetryMessage(msg)
 	ctx, cancel := context.WithCancel(context.Background())
 	m.cancelFunc = cancel
 	return m, tea.Batch(cmdSendMessage(ctx, m.agent, msg), tickCmd())
@@ -1238,9 +1237,7 @@ func (m model) submitInput() (model, tea.Cmd) {
 	m.logActivity(actUser, text)
 	m.updateViewport()
 	m.state = stateLoading
-	m.retryMsg = text
-	m.retryIsToolResult = false
-	m.canRetry = false
+	m.setRetryMessage(text)
 	ctx, cancel := context.WithCancel(context.Background())
 	m.cancelFunc = cancel
 	return m, tea.Batch(cmdSendMessage(ctx, m.agent, text), tickCmd())
@@ -1267,6 +1264,8 @@ func (m model) selectCommand(cmd SlashCommand) (model, tea.Cmd) {
 		m.logActivity(actUser, cmd.Name)
 		m.updateViewport()
 		m.state = stateLoading
+		// Gesendet wird cmd.Message, nicht cmd.Name — ein Retry muss denselben Text wiederholen.
+		m.setRetryMessage(cmd.Message)
 		ctx, cancel := context.WithCancel(context.Background())
 		m.cancelFunc = cancel
 		return m, tea.Batch(cmdSendMessage(ctx, m.agent, cmd.Message), tickCmd())
@@ -1281,12 +1280,7 @@ func (m model) selectCommand(cmd SlashCommand) (model, tea.Cmd) {
 		m.inputHistory = nil
 		m.historyIdx = -1
 		m.inputBeforeHistory = ""
-		m.canRetry = false
-		m.retryIsCompact = false
-		m.retryIsToolResult = false
-		m.retryMsg = ""
-		m.retryToolID = ""
-		m.retryToolOutput = ""
+		m.clearRetryState()
 		// … und die zugehörigen Dateien auf Disk.
 		deleteSession()
 		clearActivityLog()
@@ -1295,16 +1289,12 @@ func (m model) selectCommand(cmd SlashCommand) (model, tea.Cmd) {
 	case actionClearLLM:
 		// Nur der LLM-Kontext wird verworfen, die Chat-Anzeige bleibt erhalten.
 		m.agent.Reset()
-		m.canRetry = false
-		m.retryIsCompact = false
-		m.retryIsToolResult = false
-		m.retryMsg = ""
+		m.clearRetryState()
 		m.addMessage(roleSystem, L.MsgLLMCleared)
 		m.updateViewport()
 	case actionCompact:
+		m.clearRetryState()
 		m.retryIsCompact = true
-		m.retryIsToolResult = false
-		m.retryMsg = ""
 		m.addMessage(roleSystem, L.MsgCompacting)
 		m.updateViewport()
 		m.state = stateLoading
@@ -1370,6 +1360,8 @@ func (m model) handleAgentResponse(resp *AgentResponse) (model, tea.Cmd) {
 		return m.processNextTool()
 	}
 	m.state = stateIdle
+	// Durchlauf abgeschlossen: keinen Retry-Zustand daraus stehen lassen.
+	m.clearRetryState()
 	if m.cfg.saveSessions {
 		saveSession(m.messages, m.agent.history, m.inputHistory)
 	}
@@ -1392,7 +1384,10 @@ func (m model) processNextTool() (model, tea.Cmd) {
 		m.updateViewport()
 		ctx, cancel := context.WithCancel(context.Background())
 		m.cancelFunc = cancel
-		return m, tea.Batch(cmdRunCommand(ctx, tool.id, tool.command), tickCmd())
+		// Kein zweites tickCmd(): state bleibt seit dem auslösenden submitInput/
+		// triggerShortcut/doRetry durchgehend in {stateLoading, stateExecuting},
+		// die laufende Spinner-Kette (siehe spinTickMsg-Handler) rearmt sich selbst.
+		return m, cmdRunCommand(ctx, tool.id, tool.command)
 	}
 
 	m.pendingTool = &tool
@@ -1427,7 +1422,8 @@ func (m model) handleCommandResult(msg commandResultMsg) (model, tea.Cmd) {
 	ctx, cancel := context.WithCancel(context.Background())
 	m.cancelFunc = cancel
 	m.state = stateLoading
-	return m, tea.Batch(cmdSendToolResult(ctx, m.agent, msg.callID, output), tickCmd())
+	// Kein zweites tickCmd() — siehe Kommentar in processNextTool.
+	return m, cmdSendToolResult(ctx, m.agent, msg.callID, output)
 }
 
 // --- Tea-Befehlsfabriken ---
@@ -1486,6 +1482,26 @@ func cmdCompact(ctx context.Context, agent *Agent) tea.Cmd {
 		}
 		return compactDoneMsg{msgCount: histLen}
 	}
+}
+
+// clearRetryState verwirft jeden gemerkten Retry-Vorgang. Nötig überall, wo ein
+// Durchlauf abgeschlossen ist — sonst wiederholt doRetry() später den falschen
+// Vorgang, weil es nach retryIsToolResult, dann retryIsCompact, dann retryMsg
+// verzweigt und ein stehengebliebenes Flag den passenden Zweig verdeckt.
+func (m *model) clearRetryState() {
+	m.canRetry = false
+	m.retryMsg = ""
+	m.retryIsToolResult = false
+	m.retryIsCompact = false
+	m.retryToolID = ""
+	m.retryToolOutput = ""
+}
+
+// setRetryMessage merkt sich eine ausgehende Nutzernachricht für einen möglichen
+// Retry und verwirft dabei die Retry-Zustände des vorherigen Durchlaufs.
+func (m *model) setRetryMessage(text string) {
+	m.clearRetryState()
+	m.retryMsg = text
 }
 
 func (m model) doRetry() (model, tea.Cmd) {

@@ -73,6 +73,9 @@ type compactDoneMsg struct {
 type errMsg struct{ err error }
 type spinTickMsg struct{}
 
+// clipboardMsg trägt den Inhalt der Zwischenablage nach Strg+V.
+type clipboardMsg struct{ text string }
+
 // --- Modell ---
 
 const maxACVisible = 8

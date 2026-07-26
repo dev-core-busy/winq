@@ -214,9 +214,26 @@ Nach einer Sprachänderung muss `rebuildTools()` aufgerufen werden, weil Tool-Be
 - Der System-Prompt wird bei jedem Aufruf dynamisch zusammengebaut (`customPrompt` vorangestellt)
 - Gesprächsverlauf wird in `Agent.history` gehalten; `Reset()` löscht alles außer dem System-Prompt
 
+### Verlauf leeren
+
+| Befehl | Wirkung |
+|--------|---------|
+| `/clear-history` (`actionClearHistory`) | `m.messages`, `agent.Reset()`, `m.activities`, `m.inputHistory` **und** die Dateien `session.json` (`deleteSession()`) + `activities.log` (`clearActivityLog()`) |
+| `/clear-llm-context` (`actionClearLLM`) | nur `agent.Reset()` – die Chat-Anzeige bleibt erhalten, das LLM startet ohne Vorwissen |
+| `/compact` (`actionCompact`) | ersetzt die LLM-History durch eine vom LLM erzeugte Zusammenfassung |
+
+`saveSession()` löscht die Sitzungsdatei, wenn nach dem Herausfiltern der `roleSystem`-Nachrichten nichts übrig bleibt – sonst würde `/clear-history` beim Beenden eine leere `session.json` zurücklassen.
+
 ### LLM-Profil-Discovery (`discovery.go`)
 
 Scannt häufige Ports (11434, 1234, 8080 …) parallel per TCP-Probe und fragt dann sowohl OpenAI `/models` als auch Ollama `/api/tags` ab. Akzeptiert als Eingabe volle URL, `host:port`, oder nur Hostname.
+
+### Tastatur & Zwischenablage (Windows-spezifisch)
+
+Bubbletea liest unter Windows nicht den Byte-Stream, sondern die Console-Input-API (`ReadConsoleInput`). Daraus folgen zwei Eigenheiten:
+
+- **AltGr-Zeichen** (`\`, `@`, `[`, `]`, `{`, `}`, `|`, `~`, `€`) melden `LEFT_CTRL + RIGHT_ALT`. Bis bubbletea v0.26.x landeten sie im Control-Key-Zweig und das Zeichen ging verloren. **Mindestens bubbletea v1.3.10 nötig** — dort wird AltGr als Rune erkannt (`key_windows.go`). Nicht auf v0.26.x zurückgehen.
+- **Bracketed Paste** wird über diesen Pfad nicht geparst, deshalb `tea.WithoutBracketedPaste()` in `main.go` — sonst landet `ESC[200~` als Text im Eingabefeld. Strg+V wird stattdessen selbst behandelt: `cmdReadClipboard()` (via `atotto/clipboard`) → `clipboardMsg` → `handlePaste()` in `update.go`.
 
 ### Datei-Übersicht
 

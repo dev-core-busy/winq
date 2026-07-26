@@ -131,6 +131,8 @@ type UIStrings struct {
 	MsgExitError         string // "⚠ Exit-Fehler: "
 	MsgToolRejected      string // Tool-Ablehnung an LLM
 	RetryHint            string // "↩ Nochmals · Esc: Verwerfen"
+	MsgHistoryCleared    string // "🗑 Verlauf gelöscht …"
+	MsgLLMCleared        string // "🧠 LLM-Kontext geleert …"
 	MsgCompacting        string // "Komprimiere Kontext…"
 	MsgCompactedFmt      string // "📦 %d Nachrichten → Zusammenfassung:\n  %s"
 	CompactPrompt        string // Summarization-Prompt ans LLM
@@ -219,6 +221,7 @@ type UIStrings struct {
 	CmdActivitiesDesc string
 	CmdHelpDesc       string
 	CmdClearDesc      string
+	CmdClearLLMDesc   string // "/clear-llm-context"
 	CmdCompactDesc    string
 	CmdExitDesc       string
 	HelpText          string
@@ -361,6 +364,8 @@ var de = UIStrings{
 	MsgExitError:         "⚠ Exit-Fehler: ",
 	MsgToolRejected:      "FEHLER: Der Benutzer hat die Ausführung abgelehnt.",
 	RetryHint:            "  ↩ Nochmals versuchen · Esc: Verwerfen",
+	MsgHistoryCleared:    "🗑 Verlauf gelöscht · Chat, LLM-Kontext, Sitzungsdatei und Aktivitätsprotokoll geleert",
+	MsgLLMCleared:        "🧠 LLM-Kontext geleert · der Chat-Verlauf bleibt sichtbar",
 	MsgCompacting:        "📦 Komprimiere LLM-Kontext…",
 	MsgCompactedFmt:      "📦 Kontext komprimiert · %d Nachrichten",
 	CompactPrompt:        "Fasse unsere bisherige Unterhaltung in 3–5 prägnanten Sätzen zusammen. Nenne alle wichtigen Befehle, Systemzustände und Erkenntnisse. Antworte ausschließlich mit der Zusammenfassung, ohne Einleitung oder Kommentar.",
@@ -441,7 +446,8 @@ TOOL-NUTZUNG:
 	CmdColorsDesc:     "",
 	CmdActivitiesDesc: "Aktivitätsprotokoll anzeigen",
 	CmdHelpDesc:       "Hilfe anzeigen",
-	CmdClearDesc:      "Chat-Verlauf und LLM-Kontext leeren",
+	CmdClearDesc:      "Alles leeren: Chat, LLM-Kontext, Sitzungsdatei, Aktivitätslog",
+	CmdClearLLMDesc:   "Nur LLM-Kontext leeren (Chat bleibt sichtbar)",
 	CmdCompactDesc:    "LLM-Kontext komprimieren (Zusammenfassung erstellen)",
 	CmdExitDesc:       "Programm beenden",
 
@@ -464,7 +470,12 @@ SLASH-BEFEHLE (tippe / für Autovervollständigung):
   /config        – Einstellungen (LLM, System-Prompt, Tastenkürzel, Sprache)
   /setup         – winq systemweit installieren / deinstallieren
   /activities    – Aktivitätsprotokoll dieser Sitzung
-  /clear-history – Chat-Verlauf und LLM-Kontext vollständig leeren
+  /clear-history – Alles leeren: Chat-Anzeige, LLM-Kontext, gespeicherte
+                   Sitzung (session.json) und Aktivitätsprotokoll
+                   (activities.log) werden gelöscht.
+  /clear-llm-context
+                 – Nur den LLM-Kontext leeren. Der Chat-Verlauf bleibt
+                   sichtbar, das LLM startet aber ohne Vorwissen.
   /compact       – LLM-Kontext komprimieren: erstellt eine Zusammenfassung der
                    bisherigen Unterhaltung und ersetzt damit den vollen Verlauf.
   /exit          – Beenden
@@ -617,6 +628,8 @@ var en = UIStrings{
 	MsgExitError:         "⚠ Exit error: ",
 	MsgToolRejected:      "ERROR: The user rejected the execution.",
 	RetryHint:            "  ↩ Retry · Esc: Dismiss",
+	MsgHistoryCleared:    "🗑 History cleared · chat, LLM context, session file and activity log wiped",
+	MsgLLMCleared:        "🧠 LLM context cleared · the chat history stays visible",
 	MsgCompacting:        "📦 Compressing LLM context…",
 	MsgCompactedFmt:      "📦 Context compacted · %d messages",
 	CompactPrompt:        "Summarize our conversation so far in 3–5 concise sentences. Include all important commands, system states, and findings. Respond with the summary only, without any introduction or comment.",
@@ -697,7 +710,8 @@ TOOL USAGE:
 	CmdColorsDesc:     "",
 	CmdActivitiesDesc: "Show activity log",
 	CmdHelpDesc:       "Show help",
-	CmdClearDesc:      "Clear chat history and LLM context",
+	CmdClearDesc:      "Clear everything: chat, LLM context, session file, activity log",
+	CmdClearLLMDesc:   "Clear LLM context only (chat stays visible)",
 	CmdCompactDesc:    "Compress LLM context (create summary)",
 	CmdExitDesc:       "Exit program",
 
@@ -720,7 +734,11 @@ SLASH COMMANDS (type / for autocomplete):
   /config        – Settings (LLM, system prompt, shortcuts, language)
   /setup         – Install / uninstall winq system-wide
   /activities    – Activity log for this session
-  /clear-history – Fully clear chat history and LLM context
+  /clear-history – Clear everything: chat display, LLM context, saved session
+                   (session.json) and activity log (activities.log).
+  /clear-llm-context
+                 – Clear the LLM context only. The chat history stays
+                   visible, but the LLM starts without prior knowledge.
   /compact       – Compress LLM context: creates a summary and replaces history.
   /exit          – Exit
 
@@ -872,6 +890,8 @@ var zh = UIStrings{
 	MsgExitError:         "⚠ 退出错误：",
 	MsgToolRejected:      "错误：用户拒绝了此操作。",
 	RetryHint:            "  ↩ 重试 · Esc：取消",
+	MsgHistoryCleared:    "🗑 记录已清除 · 聊天、LLM 上下文、会话文件和活动日志均已清空",
+	MsgLLMCleared:        "🧠 LLM 上下文已清空 · 聊天记录仍然可见",
 	MsgCompacting:        "📦 正在压缩 LLM 上下文…",
 	MsgCompactedFmt:      "📦 上下文已压缩 · %d 条消息",
 	CompactPrompt:        "请用3–5句话总结我们迄今为止的对话。包括所有重要的命令、系统状态和发现。只回复摘要，不需要介绍或评论。",
@@ -952,7 +972,8 @@ var zh = UIStrings{
 	CmdColorsDesc:     "",
 	CmdActivitiesDesc: "显示活动日志",
 	CmdHelpDesc:       "显示帮助",
-	CmdClearDesc:      "清除聊天记录和 LLM 上下文",
+	CmdClearDesc:      "清除全部：聊天、LLM 上下文、会话文件、活动日志",
+	CmdClearLLMDesc:   "仅清除 LLM 上下文（聊天记录保留）",
 	CmdCompactDesc:    "压缩 LLM 上下文（创建摘要）",
 	CmdExitDesc:       "退出程序",
 
@@ -975,7 +996,11 @@ var zh = UIStrings{
   /config        – 设置（LLM、系统提示词、快捷键、语言）
   /setup         – 系统级安装 / 卸载 winq
   /activities    – 本次会话的活动日志
-  /clear-history – 完全清除聊天记录和 LLM 上下文
+  /clear-history – 清除全部：聊天显示、LLM 上下文、已保存的会话
+                   （session.json）和活动日志（activities.log）。
+  /clear-llm-context
+                 – 仅清除 LLM 上下文。聊天记录仍然可见，
+                   但 LLM 将不再记得之前的内容。
   /compact       – 压缩 LLM 上下文：创建摘要并替换完整历史记录。
   /exit          – 退出
 

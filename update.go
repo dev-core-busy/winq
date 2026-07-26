@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -209,10 +210,85 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case clipboardMsg:
+		return m.handlePaste(msg.text)
+
 	case tea.KeyMsg:
 		return m.handleKey(msg)
 	}
 
+	return m, nil
+}
+
+// --- Zwischenablage ---
+
+// cmdReadClipboard liest die Zwischenablage asynchron aus.
+func cmdReadClipboard() tea.Cmd {
+	return func() tea.Msg {
+		text, err := clipboard.ReadAll()
+		if err != nil {
+			return clipboardMsg{}
+		}
+		return clipboardMsg{text: text}
+	}
+}
+
+// sanitizeClipboard bereitet Text für ein einzeiliges Eingabefeld auf:
+// Zeilenumbrüche und Tabs werden zu Leerzeichen, sonstige Steuerzeichen entfernt.
+func sanitizeClipboard(s string) string {
+	var sb strings.Builder
+	lastSpace := false
+	for _, r := range s {
+		switch {
+		case r == '\r':
+			continue
+		case r == '\n' || r == '\t':
+			if !lastSpace {
+				sb.WriteRune(' ')
+				lastSpace = true
+			}
+		case r < 0x20 || r == 0x7f:
+			continue
+		default:
+			sb.WriteRune(r)
+			lastSpace = false
+		}
+	}
+	return strings.TrimSpace(sb.String())
+}
+
+// handlePaste fügt Text aus der Zwischenablage an der Cursorposition ein.
+func (m model) handlePaste(text string) (tea.Model, tea.Cmd) {
+	if text == "" {
+		return m, nil
+	}
+
+	// Mehrzeiliger System-Prompt-Editor: Umbrüche bleiben erhalten
+	if m.state == stateEditPrompt {
+		m.promptEditor.InsertString(strings.ReplaceAll(text, "\r\n", "\n"))
+		return m, nil
+	}
+
+	clean := sanitizeClipboard(text)
+	if clean == "" {
+		return m, nil
+	}
+
+	runes := []rune(m.input.Value())
+	pos := m.input.Position()
+	if pos > len(runes) {
+		pos = len(runes)
+	}
+	m.input.SetValue(string(runes[:pos]) + clean + string(runes[pos:]))
+	m.input.SetCursor(pos + len([]rune(clean)))
+
+	if m.state == stateIdle {
+		if m.canRetry && m.input.Value() != "" {
+			m.canRetry = false
+		}
+		m.updateAC()
+	}
+	m.recalcViewport()
 	return m, nil
 }
 
@@ -238,6 +314,23 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.updateViewport()
 			return m, nil
 		}
+
+	// Strg+V: Einfügen aus der Zwischenablage. Die Windows-Konsolen-API liefert
+	// kein Bracketed Paste an Bubbletea, deshalb lesen wir selbst aus.
+	case "ctrl+v":
+		switch m.state {
+		case stateLoading, stateExecuting, stateConfirm:
+			return m, nil
+		case stateConfig:
+			if !m.configEditing {
+				return m, nil
+			}
+		case stateDiscover:
+			if m.discStep != discEnterHost && m.discStep != discEnterName {
+				return m, nil
+			}
+		}
+		return m, cmdReadClipboard()
 
 	// Shift+Tab: Ausführmodus global umschalten
 	case "shift+tab":
@@ -1181,11 +1274,32 @@ func (m model) selectCommand(cmd SlashCommand) (model, tea.Cmd) {
 		m.input.SetValue(cmd.Prompt)
 		m.input.CursorEnd()
 	case actionClearHistory:
+		// In-Memory-Zustand leeren …
 		m.messages = nil
+		m.agent.Reset()
+		m.activities = nil
+		m.inputHistory = nil
+		m.historyIdx = -1
+		m.inputBeforeHistory = ""
+		m.canRetry = false
+		m.retryIsCompact = false
+		m.retryIsToolResult = false
+		m.retryMsg = ""
+		m.retryToolID = ""
+		m.retryToolOutput = ""
+		// … und die zugehörigen Dateien auf Disk.
+		deleteSession()
+		clearActivityLog()
+		m.addMessage(roleSystem, L.MsgHistoryCleared)
+		m.updateViewport()
+	case actionClearLLM:
+		// Nur der LLM-Kontext wird verworfen, die Chat-Anzeige bleibt erhalten.
 		m.agent.Reset()
 		m.canRetry = false
 		m.retryIsCompact = false
-		deleteSession()
+		m.retryIsToolResult = false
+		m.retryMsg = ""
+		m.addMessage(roleSystem, L.MsgLLMCleared)
 		m.updateViewport()
 	case actionCompact:
 		m.retryIsCompact = true

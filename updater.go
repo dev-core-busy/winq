@@ -148,14 +148,22 @@ func cmdDownloadUpdate(info updateInfo) tea.Cmd {
 // semverGT gibt true zurück wenn a semantisch größer als b ist (z.B. "v1.0.10" > "v1.0.9").
 func semverGT(a, b string) bool {
 	parse := func(v string) [3]int {
-		v = strings.TrimPrefix(v, "v")
+		v = strings.TrimPrefix(strings.TrimSpace(v), "v")
 		parts := strings.SplitN(v, ".", 3)
 		for len(parts) < 3 {
 			parts = append(parts, "0")
 		}
 		var n [3]int
 		for i := 0; i < 3; i++ {
-			n[i], _ = strconv.Atoi(parts[i])
+			// Nur die führenden Ziffern auswerten: bei "12-rc1" lieferte
+			// Atoi sonst einen Fehler und damit 0 – ein Vorabversions-Tag
+			// hätte dadurch als älter gegolten als sein Vorgänger.
+			p := parts[i]
+			end := 0
+			for end < len(p) && p[end] >= '0' && p[end] <= '9' {
+				end++
+			}
+			n[i], _ = strconv.Atoi(p[:end])
 		}
 		return n
 	}

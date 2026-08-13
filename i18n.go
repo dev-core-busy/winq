@@ -24,8 +24,6 @@ type UIStrings struct {
 	InputPlaceholder  string
 	HintSlashKey      string // Taste "/"
 	HintSlashLabel    string // "Befehle"
-	HintScrollKeys    string // "↑↓"
-	HintScrollLabel   string // "scrollen"
 	HintModeKey       string // "Shift+Tab"
 	HintModeLabel     string // "Modus"
 	HintShortcutKeys  string // "F1–F9"
@@ -240,8 +238,6 @@ var de = UIStrings{
 	InputPlaceholder:  "Nachricht eingeben oder / für Befehle…",
 	HintSlashKey:      "/",
 	HintSlashLabel:    "Befehle",
-	HintScrollKeys:    "↑↓",
-	HintScrollLabel:   "scrollen",
 	HintModeKey:       "Shift+Tab",
 	HintModeLabel:     "Modus",
 	HintShortcutKeys:  "F1–F9/Alt+1–9",
@@ -504,8 +500,6 @@ var en = UIStrings{
 	InputPlaceholder:  "Enter a message or type / for commands…",
 	HintSlashKey:      "/",
 	HintSlashLabel:    "commands",
-	HintScrollKeys:    "↑↓",
-	HintScrollLabel:   "scroll",
 	HintModeKey:       "Shift+Tab",
 	HintModeLabel:     "mode",
 	HintShortcutKeys:  "F1–F9/Alt+1–9",
@@ -766,8 +760,6 @@ var zh = UIStrings{
 	InputPlaceholder:  "输入消息或键入 / 查看命令…",
 	HintSlashKey:      "/",
 	HintSlashLabel:    "命令",
-	HintScrollKeys:    "↑↓",
-	HintScrollLabel:   "滚动",
 	HintModeKey:       "Shift+Tab",
 	HintModeLabel:     "模式",
 	HintShortcutKeys:  "F1–F9/Alt+1–9",

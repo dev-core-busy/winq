@@ -345,7 +345,7 @@ var de = UIStrings{
 
 	MsgUpdateAvailable:   "🔄 Neue Version %s verfügbar. Alt+U installieren · Esc ignorieren",
 	MsgUpdateDownloading: "⬇ Lade winq %s herunter…",
-	MsgUpdateDone:        "✓ winq %s installiert — bitte neu starten",
+	MsgUpdateDone:        "✓ winq %s heruntergeladen — beim nächsten Start aktiv",
 	MsgUpdateUpToDate:    "✓ winq ist aktuell (%s)",
 	MsgUpdateError:       "⚠ Update fehlgeschlagen: %s",
 	MsgModeAuto:          "⚡ Modus: Auto-Ausführen (Befehle werden ohne Rückfrage ausgeführt)",
@@ -607,7 +607,7 @@ var en = UIStrings{
 
 	MsgUpdateAvailable:   "🔄 New version %s available. Alt+U to install · Esc to skip",
 	MsgUpdateDownloading: "⬇ Downloading winq %s…",
-	MsgUpdateDone:        "✓ winq %s installed — please restart",
+	MsgUpdateDone:        "✓ winq %s downloaded — active on next start",
 	MsgUpdateUpToDate:    "✓ winq is up to date (%s)",
 	MsgUpdateError:       "⚠ Update failed: %s",
 	MsgModeAuto:          "⚡ Mode: Auto-execute (commands run without confirmation)",
@@ -867,7 +867,7 @@ var zh = UIStrings{
 
 	MsgUpdateAvailable:   "🔄 新版本 %s 可用。Alt+U 安装 · Esc 跳过",
 	MsgUpdateDownloading: "⬇ 正在下载 winq %s…",
-	MsgUpdateDone:        "✓ winq %s 已安装 — 请重启",
+	MsgUpdateDone:        "✓ winq %s 已下载 — 下次启动时生效",
 	MsgUpdateUpToDate:    "✓ winq 已是最新版本（%s）",
 	MsgUpdateError:       "⚠ 更新失败：%s",
 	MsgModeAuto:          "⚡ 模式：自动执行（命令无需确认直接运行）",

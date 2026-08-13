@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-const currentVersion = "v1.0.12"
+const currentVersion = "v1.0.13"
 const githubReleasesAPI = "https://api.github.com/repos/dev-core-busy/winq/releases/latest"
 
 type updateInfo struct {
@@ -100,7 +101,9 @@ func cmdScheduleUpdateCheck() tea.Cmd {
 	}
 }
 
-// cmdDownloadUpdate lädt die neue Binary herunter und ersetzt die laufende.
+// cmdDownloadUpdate lädt die neue Binary als .pending-Datei herunter.
+// Die eigentliche Ersetzung übernimmt applyPendingUpdate() beim nächsten Start —
+// dann ist kein Prozess mehr aktiv, der die Datei sperrt (Windows-spezifisches Problem).
 func cmdDownloadUpdate(info updateInfo) tea.Cmd {
 	return func() tea.Msg {
 		exe, err := os.Executable()
@@ -116,33 +119,57 @@ func cmdDownloadUpdate(info updateInfo) tea.Cmd {
 		}
 		defer resp.Body.Close()
 
-		tmpFile := exe + ".new"
-		out, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+		pendingFile := exe + ".pending"
+		out, err := os.OpenFile(pendingFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
 		if err != nil {
 			return updateDoneMsg{err: fmt.Errorf("Temp-Datei: %w", err)}
 		}
 		if _, err = io.Copy(out, resp.Body); err != nil {
 			out.Close()
-			os.Remove(tmpFile)
+			os.Remove(pendingFile)
 			return updateDoneMsg{err: fmt.Errorf("Schreiben: %w", err)}
 		}
 		out.Close()
 
-		// Atomic replace: aktuell → .old, neu → aktuell
-		oldFile := exe + ".old"
-		os.Remove(oldFile)
-		if err := os.Rename(exe, oldFile); err != nil {
-			os.Remove(tmpFile)
-			return updateDoneMsg{err: fmt.Errorf("Konnte Binary nicht ersetzen: %w", err)}
-		}
-		if err := os.Rename(tmpFile, exe); err != nil {
-			os.Rename(oldFile, exe) // Rollback
-			return updateDoneMsg{err: fmt.Errorf("Installation fehlgeschlagen: %w", err)}
-		}
-		os.Remove(oldFile)
-
 		return updateDoneMsg{version: info.version}
 	}
+}
+
+// applyPendingUpdate prüft beim Programmstart ob ein heruntergeladenes Update (.pending)
+// vorliegt, wendet es an und startet winq mit dem neuen Binary neu.
+// Muss ganz am Anfang von main() aufgerufen werden — vor jeder TUI-Initialisierung,
+// damit die Konsolen-Handles sauber vererbt werden.
+func applyPendingUpdate() {
+	exe, err := os.Executable()
+	if err != nil {
+		return
+	}
+	exe, _ = filepath.EvalSymlinks(exe)
+	pendingFile := exe + ".pending"
+	if _, err := os.Stat(pendingFile); os.IsNotExist(err) {
+		return
+	}
+
+	oldFile := exe + ".old"
+	os.Remove(oldFile)
+	if err := os.Rename(exe, oldFile); err != nil {
+		return
+	}
+	if err := os.Rename(pendingFile, exe); err != nil {
+		os.Rename(oldFile, exe) // Rollback
+		return
+	}
+	os.Remove(oldFile)
+
+	// Neustart mit neuem Binary (vor TUI: Handles noch unverändert → klappt auf Windows)
+	cmd := exec.Command(exe, os.Args[1:]...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		return
+	}
+	os.Exit(0)
 }
 
 // semverGT gibt true zurück wenn a semantisch größer als b ist (z.B. "v1.0.10" > "v1.0.9").

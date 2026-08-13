@@ -140,23 +140,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.err != nil {
 			m.addMessage(roleError, fmt.Sprintf(L.MsgUpdateError, msg.err.Error()))
 			m.updateViewport()
-			// Kette nach Fehler weiterlaufen lassen
 			if m.cfg.autoUpdate != "off" {
 				m.nextUpdateAt = time.Now().Add(30 * time.Minute)
 				return m, cmdScheduleUpdateCheck()
 			}
 			return m, nil
 		}
-		if m.cfg.autoUpdate == "auto" {
-			restartAfterUpdate = true
-			updatedToVersion = msg.version
-			// Beenden ohne Speichern hätte den letzten Dialogschritt verloren.
-			if m.cfg.saveSessions {
-				saveSession(m.messages, m.agent.history, m.inputHistory)
-			}
-			return m, tea.Quit
-		}
-		// ask-Modus: manuelles Update fertig — Kette neu starten
+		// Update heruntergeladen — applyPendingUpdate() übernimmt beim nächsten Start
 		m.addMessage(roleSystem, fmt.Sprintf(L.MsgUpdateDone, msg.version))
 		m.updateViewport()
 		if m.cfg.autoUpdate != "off" {

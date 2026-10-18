@@ -58,7 +58,13 @@ func (m model) renderTitle() string {
 	} else {
 		sessBadge = sessionBadgeOffStyle.Render(L.BadgeSessionOff)
 	}
-	badgeWidth := lipgloss.Width(modeBadge) + lipgloss.Width(sessBadge)
+	var mouseBadge string
+	if m.cfg.mouseTracking {
+		mouseBadge = mouseBadgeOnStyle.Render(L.BadgeMouseOn)
+	} else {
+		mouseBadge = mouseBadgeOffStyle.Render(L.BadgeMouseOff)
+	}
+	badgeWidth := lipgloss.Width(modeBadge) + lipgloss.Width(mouseBadge) + lipgloss.Width(sessBadge)
 
 	var label string
 	switch m.state {
@@ -73,7 +79,7 @@ func (m model) renderTitle() string {
 		titleWidth = 0
 	}
 	titleText := "  " + label + "  " + currentVersion
-	return titleBarStyle.Width(titleWidth).Render(titleText) + modeBadge + sessBadge
+	return titleBarStyle.Width(titleWidth).Render(titleText) + modeBadge + mouseBadge + sessBadge
 }
 
 // wrapToWidth bricht einen (ggf. ANSI-gestylten) Text explizit bei width um, statt
@@ -218,6 +224,7 @@ func (m model) renderIdleBottom() string {
 
 	hint := hintStyle.Render("  ") +
 		hintKeyStyle.Render(L.HintSlashKey) + hintStyle.Render(" "+L.HintSlashLabel+"  ") +
+		hintKeyStyle.Render(L.HintMouseKey) + hintStyle.Render(" "+L.HintMouseLabel+"  ") +
 		hintKeyStyle.Render(L.HintHistoryKeys) + hintStyle.Render(" "+L.HintHistoryLabel+"  ") +
 		hintKeyStyle.Render(L.HintModeKey) + hintStyle.Render(" "+L.HintModeLabel+"  ") +
 		hintKeyStyle.Render(L.HintShortcutKeys) + hintStyle.Render(" "+L.HintShortcutLabel+"  ") +

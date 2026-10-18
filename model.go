@@ -56,6 +56,7 @@ type appConfig struct {
 	profiles         []llmProfile
 	activeProfileIdx int // -1 = kein Profil aktiv (manuelle Konfiguration)
 	saveSessions     bool
+	mouseTracking    bool   // true = Mausrad scrollt; false = Terminal-Auswahl/Rechtsklick
 	autoUpdate       string // "ask" | "auto" | "off"
 	llmTimeout       int    // Sekunden, 30–300, Standard 60
 }
@@ -153,7 +154,7 @@ func newModel() model {
 	ti.PromptStyle = promptStyle
 	ti.TextStyle = inputTextStyle
 	ti.PlaceholderStyle = placeholderStyle
-	ti.CharLimit = 512
+	ti.CharLimit = 4096
 	ti.Focus()
 
 	te := textarea.New()
@@ -215,6 +216,11 @@ func (m model) Init() tea.Cmd {
 	// cmdInitSize schickt sofort ein WindowSizeMsg — vermeidet Startup-Hänger auf Windows,
 	// wenn das Terminal das erste Resize-Event verzögert sendet.
 	cmds := []tea.Cmd{textinput.Blink, cmdInitSize()}
+	// main.go startet mit aktivem Maus-Tracking; war es zuletzt abgeschaltet,
+	// hier wieder ausschalten damit Terminal-Auswahl und Rechtsklick greifen.
+	if !m.cfg.mouseTracking {
+		cmds = append(cmds, tea.DisableMouse)
+	}
 	// Die Sitzung ist zu diesem Zeitpunkt bereits in newModel() geladen.
 	if m.cfg.activeProfileIdx >= 0 && m.cfg.activeProfileIdx < len(m.cfg.profiles) {
 		p := m.cfg.profiles[m.cfg.activeProfileIdx]

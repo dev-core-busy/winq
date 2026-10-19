@@ -264,21 +264,36 @@ Bubbletea liest unter Windows nicht den Byte-Stream, sondern die Console-Input-A
 | `i18n.go`           | Mehrsprachigkeit (de/en/zh)                            |
 | `discovery.go`      | LLM-Profil-Erkennung                                   |
 | `session_persist.go`| Sitzungsspeicherung                                    |
+| `terminal_windows.go`| `terminalSize()` für `cmdInitSize()`                  |
 
 ## Referenz
 
 Originalprojekt: `../linux_cmd_agent` (bashq)  
 Alle TODO-Punkte sind unabhängig voneinander außer Punkt 1+3 (beide betreffen syscall.Exec).
 
-## Daueraufgabe: bashq → winq synchron halten
+## Daueraufgabe: bashq ↔ winq synchron halten
 
-**Änderungen in bashq, die Windows-kompatibel sind, müssen immer auch hier umgesetzt werden.**
+**Die Sync-Pflicht gilt in BEIDE Richtungen.** Dieser Abschnitt beschrieb früher nur `bashq → winq`. Dadurch blieben hier entstandene Fixes im Originalprojekt liegen: das synchrone Sitzungsladen und die Spaltenausrichtung der Profilliste mussten nachträglich nach bashq portiert werden. Wer an einem der beiden Projekte etwas ändert, prüft also immer auch das andere:
 
-Shared files (direkt kopierbar oder manuell anpassen):
-`view.go`, `i18n.go`, `model.go`, `styles.go`, `agent.go`, `commands.go`, `activities.go`
+- **bashq → winq**: jede Windows-kompatible Änderung dort hier nachziehen.
+- **winq → bashq**: Fixes, die hier zuerst entstanden sind, zurückportieren.
+
+Praktischer Einstieg ist ein Dateidiff gegen `../linux_cmd_agent/<datei>`.
+
+Gemeinsame Dateien (Diff sollte nur Plattformdetails zeigen):
+`view.go`, `i18n.go`, `model.go`, `styles.go`, `agent.go`, `commands.go`, `activities.go`, `session_persist.go`, `config_persist.go`, `discovery.go`, `updater.go`
+
+Gemeinsame Tests (byte-identisch in beiden Bäumen):
+`session_persist_test.go`, `view_test.go`
+
+`updater_test.go` ist in beiden Bäumen **unterschiedlich** gewachsen (hier `TestSemverGT`, in bashq `TestCompareVersions` – verschiedene Funktionen, nicht nur verschiedene Namen). Nicht blind überschreiben; beim Zusammenführen prüfen, welche Funktion es in `updater.go` jeweils gibt.
 
 Windows-spezifische Dateien (NICHT überschreiben):
 - `main.go` — kein `syscall.Exec`
 - `update.go` — `powershell` statt `bash -c`
-- `selfinstall.go` — Windows PATH-Eintrag
+- `selfinstall.go` — Windows PATH-Eintrag (bashq: Symlinks)
 - `colors.go` — No-op Stub
+- `terminal_windows.go` — hat in bashq keine Entsprechung
+- Zwischenablage — hier `atotto/clipboard` in `update.go` (`clipboardMsg` in `model.go`), in bashq eine eigene `clipboard.go`
+
+Erwartete Rest-Diffs in den gemeinsamen Dateien: der Konfigverzeichnisname (`winq` ↔ `bashq`), Asset-Namen im Updater, Beispielbefehle in System-Prompt und Kommentaren sowie `cmdInitSize()` in `Init()`, das nur hier existiert.

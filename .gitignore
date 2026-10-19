@@ -1,2 +1,8 @@
 winq.exe
 *.exe
+
+# Personal files
+session.sh
+
+# Go
+*.test

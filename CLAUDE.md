@@ -19,7 +19,12 @@ go build -o winq.exe .          # Entwicklungsbuild
 Cross-Compile von Linux:
 ```bash
 GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o winq.exe .
+GOOS=windows go vet ./...
 ```
+
+**Tests von Linux aus:** `go test ./...` schlägt hier fehl – das Paket importiert `golang.org/x/sys/windows/registry`, dessen Build-Constraints alle Dateien ausschließen. Mit `GOOS=windows go test -c` lässt sich die Testbinary immerhin kompilieren (prüft Syntax und Typen). Ausführen geht unter wine; ist nur 32-Bit-wine installiert (`wine64` fehlt), muss mit `GOARCH=386` gebaut werden, sonst verweigert wine das EXE-Format.
+
+Das ist kein Luxus: `session_persist_test.go` hängt an `os.UserConfigDir()`, das unter Windows `%AppData%` statt `$XDG_CONFIG_HOME` liest. Solche Abweichungen fallen nur in einem echten Windows-Lauf auf.
 
 ## Status: v1.0.1 — vollständig Windows-fähig ✅
 
@@ -222,7 +227,13 @@ Nach einer Sprachänderung muss `rebuildTools()` aufgerufen werden, weil Tool-Be
 | `/clear-llm-context` (`actionClearLLM`) | nur `agent.Reset()` – die Chat-Anzeige bleibt erhalten, das LLM startet ohne Vorwissen |
 | `/compact` (`actionCompact`) | ersetzt die LLM-History durch eine vom LLM erzeugte Zusammenfassung |
 
-`saveSession()` löscht die Sitzungsdatei, wenn nach dem Herausfiltern der `roleSystem`-Nachrichten nichts übrig bleibt – sonst würde `/clear-history` beim Beenden eine leere `session.json` zurücklassen.
+### Sitzungspersistenz (`session_persist.go`)
+
+`saveSession()` filtert `roleSystem` und `roleOutput` heraus. Bleibt danach nichts übrig, schreibt es nicht – **löscht die Datei aber auch nicht**. Ein `os.Remove()` an dieser Stelle hatte eine intakte Sitzung vernichtet, sobald `m.messages` nur Systemmeldungen enthielt. Das Aufräumen gehört allein zu `deleteSession()`, das `/clear-history` selbst aufruft.
+
+`loadSession() (loadedSession, bool)` ist **synchron** und wird in `newModel()` aufgerufen, nicht als `tea.Cmd` in `Init()`. Asynchron gab es ein Wettrennen mit `cmdHealthCheck`: kam dessen Systemmeldung zuerst, war `m.messages` nicht mehr leer, die geladene Sitzung wurde verworfen – und beim nächsten Beenden überschrieben.
+
+`session_persist_test.go` deckt beide Punkte ab.
 
 ### LLM-Profil-Discovery (`discovery.go`)
 

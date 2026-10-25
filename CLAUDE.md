@@ -239,6 +239,14 @@ Nach einer Sprachänderung muss `rebuildTools()` aufgerufen werden, weil Tool-Be
 
 Scannt häufige Ports (11434, 1234, 8080 …) parallel per TCP-Probe und fragt dann sowohl OpenAI `/models` als auch Ollama `/api/tags` ab. Akzeptiert als Eingabe volle URL, `host:port`, oder nur Hostname.
 
+### Spaltenlayout (`view.go`, gemeinsam mit bashq)
+
+Dasselbe gilt für Spaltenlayouts: `truncToWidth()`/`truncLeftToWidth()` und `padToWidth()` (`view.go`) kürzen bzw. füllen in Terminalspalten, `fitColumns()` baut daraus eine zweispaltige Zeile, die nie über die verfügbare Breite läuft (erst den Namen bis auf eine Mindestbreite kürzen, dann die zweite Spalte, notfalls weglassen). **Nicht** `fmt.Sprintf("%-*s", …)` zum Ausrichten benutzen – dessen Breite zählt Runen. Bei Umlauten stimmt das zufällig, bei Breitzeichen nicht: `通义` sind zwei Runen, belegen aber vier Spalten. Ebenso wenig byteweise kürzen (`s[:n]`) – das zerschneidet UTF-8. Gemessen wird nach Graphem-Clustern (`graphemes()`, uniseg), nicht runenweise: `❤️` ist U+2764 + U+FE0F, runenweise eine Spalte, tatsächlich zwei; und `👍🏽` darf beim Kürzen nicht vom Hautton getrennt werden.
+
+`cellWidth()` ersetzt `lipgloss.Width()` überall, wo selbst gerechnet wird: Es berücksichtigt `ambiguousWide` (aus `runewidth.EastAsianWidth`, also der Locale bzw. unter Windows der Konsolen-Codepage). In Terminals mit CJK-Locale belegen East-Asian-Ambiguous-Zeichen wie `…`, `▶`, `–`, `─` zwei Spalten; lipgloss zählt sie immer einfach. Den Auswahlpfeil darum über `markerPrefix(sel)` setzen, nicht als `"▶ "`-Literal – unmarkierte Zeilen werden dann gleich weit eingerückt. Bereits gestylte Werte kürzt `ansi.Truncate()` (zerschneidet keine Escape-Sequenzen). Tests setzen `ambiguousWide` per `setAmbiguousWide()`, sonst hinge das Ergebnis von der Locale der Testmaschine ab.
+
+Die Discover-Modellliste leitet ihre sichtbaren Zeilen aus dem tatsächlich gerenderten Kopf ab (`discModelRows()`, auch von `updateModelWindow()` benutzt) statt aus einer Konstante – die Fundzeile wird umgebrochen und kann bei schmalem Terminal zwei Zeilen belegen. `view_test.go` prüft Ausrichtung und Maximalbreite am gerenderten Text (Discover-Liste, Profilliste, Konfig-Labels auf Chinesisch, schmale Terminals).
+
 ### Tastatur & Zwischenablage (Windows-spezifisch)
 
 Bubbletea liest unter Windows nicht den Byte-Stream, sondern die Console-Input-API (`ReadConsoleInput`). Daraus folgen zwei Eigenheiten:

@@ -219,6 +219,17 @@ Nach einer Sprachänderung muss `rebuildTools()` aufgerufen werden, weil Tool-Be
 - Der System-Prompt wird bei jedem Aufruf dynamisch zusammengebaut (`customPrompt` vorangestellt)
 - Gesprächsverlauf wird in `Agent.history` gehalten; `Reset()` löscht alles außer dem System-Prompt
 
+### Automatischer Modellwechsel (`agent.go`, `discovery.go`)
+
+Ist der Host erreichbar, bietet aber das konfigurierte Modell nicht (mehr) an – typisch, wenn auf dem Server ein anderes Modell geladen wurde –, wechselt der Agent selbständig auf ein verfügbares Modell, statt den Dienst mit „model not found" zu verweigern:
+
+- **Beim Start**: `cmdHealthCheck` holt nach erfolgreichem Erreichbarkeitstest die Modellliste (`listModels()`, mit API-Key). Fehlt das Profilmodell, trägt `healthCheckMsg` `modelFrom`/`modelTo`. Übernommen wird nur, wenn Profil und Modell seit dem Start unverändert sind (die Nachricht kommt asynchron).
+- **Beim Chat**: `callLLM()` ruft `callLLMOnce()` auf. Meldet der Server einen Fehler (`apiError`: HTTP-Status ≥ 400 oder `error`-Feld als Objekt **oder** String), prüft es die Modellliste und wiederholt **einmal** mit dem Ersatz. Scheitert auch das, wird das alte Modell wiederhergestellt und der ursprüngliche Fehler gemeldet. 401/403/429 lösen keinen Wechsel aus, 5xx nur, wenn die Meldung „model" enthält.
+- `pickReplacementModel()` liefert `""`, solange das Modell gelistet ist (Vergleich ohne Groß/klein und ohne Ollamas `:latest`). Ein Fehler bei vorhandenem Modell führt also nie zu einem Wechsel. Sonst gewinnt der längste gemeinsame Namensanfang (gleiche Familie, Anbieterpfad ignoriert), bei Gleichstand das erste. Embedding-, Rerank-, TTS- und Whisper-Modelle werden übersprungen.
+- `AgentResponse.ModelSwitch` (auch über `compactDoneMsg`) → `applyModelSwitch()` setzt `agent.model`, `cfg.model` und das Modell des aktiven Profils, ruft `saveConfig()` auf und zeigt `L.ModelSwitchedFmt` als Systemmeldung (alt, Host, neu) und im Aktivitätsprotokoll.
+
+`model_switch_test.go` deckt Auswahl, Retry (beide Fehlerformate, keine doppelte History), Nicht-Wechsel bei vorhandenem Modell und das Speichern ab.
+
 ### Verlauf leeren
 
 | Befehl | Wirkung |
@@ -292,7 +303,7 @@ Gemeinsame Dateien (Diff sollte nur Plattformdetails zeigen):
 `view.go`, `i18n.go`, `model.go`, `styles.go`, `agent.go`, `commands.go`, `activities.go`, `session_persist.go`, `config_persist.go`, `discovery.go`, `updater.go`
 
 Gemeinsame Tests (byte-identisch in beiden Bäumen):
-`session_persist_test.go`, `view_test.go`
+`session_persist_test.go`, `view_test.go`, `model_switch_test.go`
 
 `updater_test.go` ist in beiden Bäumen **unterschiedlich** gewachsen (hier `TestSemverGT`, in bashq `TestCompareVersions` – verschiedene Funktionen, nicht nur verschiedene Namen). Nicht blind überschreiben; beim Zusammenführen prüfen, welche Funktion es in `updater.go` jeweils gibt.
 

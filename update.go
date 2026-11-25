@@ -72,6 +72,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case compactDoneMsg:
 		m.state = stateIdle
+		if msg.modelSwitch != nil {
+			m.applyModelSwitch(msg.modelSwitch)
+		}
 		// Ohne diesen Reset blieb retryIsCompact für den Rest der Sitzung gesetzt
 		// und jeder spätere Retry komprimierte statt die Anfrage zu wiederholen.
 		m.clearRetryState()
@@ -164,6 +167,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case healthCheckMsg:
 		if msg.ok {
 			m.addMessage(roleSystem, fmt.Sprintf(L.HealthOkFmt, msg.profileName))
+			// Host erreichbar, aber konfiguriertes Modell weg → nur wechseln, wenn
+			// der Nutzer seit dem Start weder Profil noch Modell geändert hat.
+			if msg.modelTo != "" && m.cfg.activeProfileIdx == msg.profileIdx &&
+				m.agent.model == msg.modelFrom {
+				m.applyModelSwitch(&ModelSwitch{From: msg.modelFrom, To: msg.modelTo, BaseURL: m.agent.baseURL})
+			}
 		} else {
 			text := fmt.Sprintf(L.HealthFailFmt, msg.profileName)
 			if msg.suggested != "" {
@@ -1360,7 +1369,26 @@ func (m model) selectCommand(cmd SlashCommand) (model, tea.Cmd) {
 
 // --- Antwort-Verarbeitung ---
 
+// applyModelSwitch übernimmt ein automatisch gewähltes Ersatzmodell in Agent,
+// Konfiguration und aktives Profil, speichert und meldet den Wechsel.
+func (m *model) applyModelSwitch(sw *ModelSwitch) {
+	m.agent.model = sw.To
+	m.cfg.model = sw.To
+	if i := m.cfg.activeProfileIdx; i >= 0 && i < len(m.cfg.profiles) &&
+		m.cfg.profiles[i].Model == sw.From {
+		m.cfg.profiles[i].Model = sw.To
+	}
+	saveConfig(m.cfg)
+	text := fmt.Sprintf(L.ModelSwitchedFmt, sw.From, sw.BaseURL, sw.To)
+	m.logActivity(actAgent, text)
+	m.addMessage(roleSystem, text)
+	m.updateViewport()
+}
+
 func (m model) handleAgentResponse(resp *AgentResponse) (model, tea.Cmd) {
+	if resp.ModelSwitch != nil {
+		m.applyModelSwitch(resp.ModelSwitch)
+	}
 	if resp.Text != "" {
 		m.logActivity(actAgent, resp.Text)
 		m.addMessage(roleAssistant, resp.Text)
@@ -1498,7 +1526,7 @@ func cmdCompact(ctx context.Context, agent *Agent) tea.Cmd {
 			{Role: "user", Content: "[Gesprächszusammenfassung]\n" + summary},
 			{Role: "assistant", Content: "Zusammenfassung zur Kenntnis genommen."},
 		}
-		return compactDoneMsg{msgCount: histLen}
+		return compactDoneMsg{msgCount: histLen, modelSwitch: resp.ModelSwitch}
 	}
 }
 
@@ -1601,7 +1629,14 @@ func cmdInitSize() tea.Cmd {
 func cmdHealthCheck(baseURL, profileName string, profiles []llmProfile, activeIdx int) tea.Cmd {
 	return func() tea.Msg {
 		if healthCheck(baseURL) == nil {
-			return healthCheckMsg{ok: true, profileName: profileName}
+			msg := healthCheckMsg{ok: true, profileName: profileName, profileIdx: activeIdx}
+			if activeIdx >= 0 && activeIdx < len(profiles) {
+				p := profiles[activeIdx]
+				if to := pickReplacementModel(p.Model, listModels(baseURL, p.APIKey)); to != "" {
+					msg.modelFrom, msg.modelTo = p.Model, to
+				}
+			}
+			return msg
 		}
 		suggested := ""
 		for i, p := range profiles {
